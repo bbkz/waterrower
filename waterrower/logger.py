@@ -3,7 +3,6 @@ import json
 import threading
 import copy
 import time
-import io
 import logging
 
 IGNORE_LIST = ['graph', 'tank_volume', 'display_hr', 'display_min', 'display_sec', 'display_sec_dec']
@@ -60,8 +59,8 @@ class DataLogger(object):
             # TODO add global avg
             # TODO add max?
 
-            with io.open('json/event_%s.json' % self._activity['start_time'], 'w', encoding='utf-8') as f:
-                f.write(unicode(json.dumps(self._events, ensure_ascii=False)))
+            with open('json/event_%s.json' % self._activity['start_time'], 'w', encoding='utf-8') as f:
+                f.write(json.dumps(self._events, ensure_ascii=False))
             activities = None
             try:
                 with open('json/workouts.json') as data_file:
@@ -71,10 +70,11 @@ class DataLogger(object):
             if activities is None:
                 activities = []
             activities.append(self._activity)
-            with io.open('json/workouts.json', 'w', encoding='utf-8') as f:
-                f.write(unicode(json.dumps(activities, ensure_ascii=False)))
+            with open('json/workouts.json', 'w', encoding='utf-8') as f:
+                f.write(json.dumps(activities, ensure_ascii=False))
 
-            save_to_google_fit(self._activity)
+            # disable save to google_fit for now;
+            #save_to_google_fit(self._activity)
 
             self._activity = None
 
