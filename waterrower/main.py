@@ -12,14 +12,23 @@ import interface
 import signal
 import sys
 import datetime
-
-from tornado.options import define, options
-
+import argparse
 from logger import DataLogger
 
-define("port", default=8000, help="port to run on", type=int)
-define("demo", default=False, help="stub connection to rower", type=bool)
-define("debug", default=False, help="run in debug mode", type=bool)
+## Set up the command-line options (parameters)
+parser = argparse.ArgumentParser(description='Waterrower S4')
+parser.add_argument("-d", help="show debug informations", default=False, action="store_true", dest="debug")
+parser.add_argument("-p", "--port", default=8000, help="webserver port to use", dest="port")
+parser.add_argument("-t", "--test", default=False, action="store_true", dest="demo")
+
+## Parse the parameters from command-line (options)
+options = parser.parse_args()
+
+# logging class / debug informations
+if options.debug:
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.basicConfig(level=logging.INFO)
 
 
 class Application(tornado.web.Application):
@@ -46,7 +55,6 @@ def build_cleanup(rower_interface):
 
 
 def main():
-    tornado.options.parse_command_line()
     rower_interface = interface.Rower(options)
     #TODO allow to load history of logger?
     DataLogger(rower_interface)
@@ -59,4 +67,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

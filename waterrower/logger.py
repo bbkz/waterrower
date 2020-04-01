@@ -137,9 +137,9 @@ def save_to_google_fit(activity):
              ]
             }
 
-            print fit_service.users().dataSources().datasets().patch(userId="me",
+            print(fit_service.users().dataSources().datasets().patch(userId="me",
                     dataSourceId="raw:com.google.activity.segment:197772635046:waterrower:S4:1",
-                    datasetId="%s-%s" % (start_time, end_time), body=body).execute()
+                    datasetId="%s-%s" % (start_time, end_time), body=body).execute())
 
             body = {
              "dataSourceId": "raw:com.google.distance.delta:197772635046:waterrower:S4:1",
@@ -159,9 +159,9 @@ def save_to_google_fit(activity):
              ]
             }
 
-            print fit_service.users().dataSources().datasets().patch(userId="me",
+            print(fit_service.users().dataSources().datasets().patch(userId="me",
                     dataSourceId="raw:com.google.distance.delta:197772635046:waterrower:S4:1",
-                    datasetId="%s-%s" % (start_time, end_time), body=body).execute()
+                    datasetId="%s-%s" % (start_time, end_time), body=body).execute())
 
             body = {
              "activityType": 103,
@@ -173,8 +173,8 @@ def save_to_google_fit(activity):
              "name": "Ergo rowing",
              "startTimeMillis": activity['start_time']
             }
-            print fit_service.users().sessions().update(userId="me", sessionId="ergo_%s" % activity['start_time'],
-                                                        body=body).execute()
+            print(fit_service.users().sessions().update(userId="me", sessionId="ergo_%s" % activity['start_time'],
+                                                        body=body).execute())
 
     except Exception as e:
         logging.error(e)
