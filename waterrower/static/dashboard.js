@@ -6,26 +6,11 @@ dashboard = (function($) {
     var timerId = null;
     var workoutDistance = 0;
     var workoutDuration = 0;
-    var chart;
-    var chartData;
     var heart_rate = [];
-    var chart_series = {
-        heart_rate: [],
-        stroke_rate: []
-    }
-    var chart_data = [{
-                values: chart_series.heart_rate,
-                key: 'Heart rate',
-                type: 'line',
-                yAxis: 1
-            }, {
-                values: chart_series.stroke_rate,
-                key: 'Stroke rate',
-                type: 'line',
-                yAxis: 2
-            }
-    ];
+    // d3 nest compatible
+    var chart_series = []
 
+    // handle callbacks from interface.py and other sources (ui)
     var messagehandlers = {
         display_sec: function(data) {
             $('#clock #seconds').text(pad(data.value, 2));
@@ -78,29 +63,30 @@ dashboard = (function($) {
             $('#heart_rate').text(data.value);
         },
         reset: function(data){
-            polar.reset();
-            chart_series.heart_rate.length = 0;
-            chart_series.stroke_rate.length = 0;
+            polarchart.reset();
+            chart_series.length = 0;
         },
-        'workout-start': function(data){
+        'workout-start': function(data){ //??
 
         },
         graph: function(data){
-            // Update the SVG with the new data and call chart
-            if(data.value.heart_rate > 0 || chart_series.heart_rate.length > 0) {
-                chart_series.heart_rate.push({x: data.value.elapsed || 0, y: data.value.heart_rate || 0});
+            if(data.verbose == true){
+                console.log(data)
             }
-            if(data.value.stroke_rate > 0 || chart_series.stroke_rate.length > 0){
-                chart_series.stroke_rate.push({x: data.value.elapsed || 0, y: data.value.stroke_rate || 0});
+            // Update the SVG with the new data and call chart - prevent 0 mesures
+            if(data.value.heart_rate > 0){
+                chart_series.push({type: "heart_rate" || 0, elapsed: data.value.elapsed || 0, rate: data.value.heart_rate || 0});
             }
-            chartData.datum(chart_data).transition().duration(500).call(chart);
-            nv.utils.windowResize(chart.update);
-
+            if(data.value.stroke_rate > 0){
+                chart_series.push({type: "stroke_rate" || 0, elapsed: data.value.elapsed || 0, rate: data.value.stroke_rate || 0});
+            }
+            // send d3 nest compatible data
+            linechart.update(chart_series)
         }
 
     };
 
-    function updatePolar() {
+    function updatePolarChart() {
         var data = [];
         var strokeRate = parseInt($('#stroke-rate').text());
         data.push({name: 's/m',
@@ -127,9 +113,9 @@ dashboard = (function($) {
         }
         var mps = parseFloat($("#avg-mps").text());
         data.push({name: 'm/s',
-                   value: (!isNaN(mps) && mps > 0) ? mps/MAX_MPS : 0,
-                   index: 0.2});
-        polar.update(data);
+                    value: (!isNaN(mps) && mps > 0) ? mps/MAX_MPS : 0,
+                    index: 0.2});
+        polarchart.update(data);
     }
 
     function pad(n, len) {
@@ -181,7 +167,7 @@ dashboard = (function($) {
         ws.onclose = onclose;
         ws.onmessage = onmessage;
         ws.onerror = onerror;
-        timerId = setInterval(updatePolar, 100);
+        timerId = setInterval(updatePolarChart, 100);
 
         $('#workout-begin').click(function() {
             var workoutTarget = $('#workout-target').val();
@@ -195,7 +181,7 @@ dashboard = (function($) {
                 if (type === "WSI") {
                     workoutDistance = workoutTarget;
                 }
-                polar.reset();
+                polarchart.reset();
                 var msg = JSON.stringify({type: 'workout-begin',
                     value: {
                         type: type,
@@ -211,31 +197,6 @@ dashboard = (function($) {
             ws.send(msg);
             return false;
         });
-
-        nv.addGraph(function() {
-            chart = nv.models.multiChart()
-                .margin({top: 30, right: 60, bottom: 50, left: 70})
-                .color(d3.scale.category10().range());
-
-                //.showLegend(true)       //Show the legend, allowing users to turn on/off line series.
-                //.showYAxis(true)        //Show the y-axis
-                //.showXAxis(true);
-
-            chart.xAxis.tickFormat(function(d) {
-                var time = Math.round(d/1000);
-                var seconds = time % 60;
-                var minutes = (time - seconds) / 60;
-                return pad(minutes, 2) + ':' + pad(seconds, 2);
-            });
-
-            chartData = d3.select('#chart svg').datum(chart_data);
-            chartData.call(chart);
-
-            //Update the chart when window resizes.
-            nv.utils.windowResize(function() { chart.update() });
-        return chart;
-        });
-
     }
 
     return {

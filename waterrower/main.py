@@ -13,13 +13,16 @@ import signal
 import sys
 import datetime
 import argparse
+import configparser
 from logger import DataLogger
 
 ## Set up the command-line options (parameters)
 parser = argparse.ArgumentParser(description='Waterrower S4')
-parser.add_argument("-d", help="show debug informations", default=False, action="store_true", dest="debug")
+parser.add_argument("-c", "--config", default=False, help="optional path to config file otherwise it will look in the following order: "+os.path.dirname(__file__)+"/waterrower.cfg | /usr/local/etc/waterrower.cfg | /etc/waterrower.cfg", dest="config")
+parser.add_argument("-d", "--debug", help="show debug informations", default=False, action="store_true", dest="debug")
 parser.add_argument("-p", "--port", default=8000, help="webserver port to use", dest="port")
 parser.add_argument("-t", "--test", default=False, action="store_true", dest="demo")
+
 
 ## Parse the parameters from command-line (options)
 options = parser.parse_args()
@@ -29,6 +32,43 @@ if options.debug:
     logging.basicConfig(level=logging.DEBUG)
 else:
     logging.basicConfig(level=logging.INFO)
+
+# Parse configuration file
+config = configparser.ConfigParser()
+
+if options.config:
+    if os.path.isfile(options.config):
+        try:
+            config.read(options.config)
+            logging.debug("[*] configuration "+options.config+" loaded...")
+        except Exception as e:
+            logging.error('[-] ', exc_info=1)
+            sys.exit(1)
+else:
+    if os.path.isfile(os.path.dirname(__file__) + '/waterrower.cfg'):
+        try:
+            config.read(os.path.dirname(__file__) + '/waterrower.cfg')
+            logging.debug("[*] configuration "+os.path.dirname(__file__)+"/waterrower.cfg loaded...")
+        except Exception as e:
+            logging.error('[-] ', exc_info=1)
+            sys.exit(1)
+    elif os.path.isfile('/usr/local/etc/waterrower.cfg'):
+        try:
+            config.read('/usr/local/etc/waterrower.cfg')
+            logging.debug("[*] configuration /usr/local/etc/waterrower.cfg loaded...")
+        except Exception as e:
+            logging.error('[-] ', exc_info=1)
+            sys.exit(1)
+    elif os.path.isfile('/etc/waterrower.cfg'):
+        try:
+            config.read('/etc/waterrower.cfg')
+            logging.debug("[*] configuration /etc/waterrower.cfg loaded...")
+        except Exception as e:
+            logging.error('[-] ', exc_info=1)
+            sys.exit(1)
+    else:
+        logging.error('[-] no configuration file found')
+        sys.exit(1)
 
 
 class Application(tornado.web.Application):
@@ -48,7 +88,7 @@ class Application(tornado.web.Application):
 
 def build_cleanup(rower_interface):
     def cleanup(signum, frame):
-        logging.info("cleaning up")
+        logging.info("[*] cleaning up serial interface")
         rower_interface.close()
         sys.exit(0)
     return cleanup
@@ -57,7 +97,7 @@ def build_cleanup(rower_interface):
 def main():
     rower_interface = interface.Rower(options)
     #TODO allow to load history of logger?
-    DataLogger(rower_interface)
+    DataLogger(rower_interface, config)
     cleanup = build_cleanup(rower_interface)
     signal.signal(signal.SIGINT, cleanup)
     rower_interface.open()

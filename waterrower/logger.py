@@ -9,7 +9,11 @@ IGNORE_LIST = ['graph', 'tank_volume', 'display_hr', 'display_min', 'display_sec
 
 
 class DataLogger(object):
-    def __init__(self, rower_interface):
+    def __init__(self, rower_interface, config):
+        self.DATAPATH = config['global']['datapath']
+        self.GOOGLE_FIT_ENABLED = config['global']['google_fit_enabled']
+        self.VERBOSE = False
+
         self._rower_interface = rower_interface
         self._rower_interface.register_callback(self.on_rower_event)
         self._event = {}
@@ -59,22 +63,23 @@ class DataLogger(object):
             # TODO add global avg
             # TODO add max?
 
-            with open('json/event_%s.json' % self._activity['start_time'], 'w', encoding='utf-8') as f:
+            with open(self.DATAPATH + '/event_%s.json' % self._activity['start_time'], 'w', encoding='utf-8') as f:
                 f.write(json.dumps(self._events, ensure_ascii=False))
             activities = None
             try:
-                with open('json/workouts.json') as data_file:
+                with open(self.DATAPATH + '/workouts.json') as data_file:
                     activities = json.load(data_file)
             except:
                 pass
             if activities is None:
                 activities = []
             activities.append(self._activity)
-            with open('json/workouts.json', 'w', encoding='utf-8') as f:
+            with open(self.DATAPATH + '/workouts.json', 'w', encoding='utf-8') as f:
                 f.write(json.dumps(activities, ensure_ascii=False))
 
-            # disable save to google_fit for now;
-            #save_to_google_fit(self._activity)
+            # upload your data to google fit, do you really want this?
+            if self.GOOGLE_FIT_ENABLED == True:
+                save_to_google_fit(self._activity)
 
             self._activity = None
 
@@ -86,19 +91,23 @@ class DataLogger(object):
             self._event['elapsed'] = self._event['time'] - self._activity['start_time']
             event = copy.deepcopy(self._event)
             self._events.append(event)
-            self._rower_interface.notify_callbacks({
+            # send event data to the websocket
+            callback_data = {
                 "type": "graph",
                 "value": event,
                 "raw": None,
                 "at": event['time']
-            })
+            }
+            if self.VERBOSE:
+                callback_data.update({"verbose": True})
+            self._rower_interface.notify_callbacks(callback_data)
             self._event = {}
             self._stop_event.wait(5)
 
 
 def save_to_google_fit(activity):
     try:
-        with open('json/config.json') as data_file:
+        with open(self.DATAPATH + '/google_fit_config.json') as data_file:
             config = json.load(data_file)
             from oauth2client import GOOGLE_REVOKE_URI
             from oauth2client import GOOGLE_TOKEN_URI
@@ -177,4 +186,4 @@ def save_to_google_fit(activity):
                                                         body=body).execute())
 
     except Exception as e:
-        logging.error(e)
+        logging.error('[-] logger.py: save_to_google_fit() -> ', exc_info=1)

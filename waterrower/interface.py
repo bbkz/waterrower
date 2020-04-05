@@ -5,6 +5,8 @@ import time
 import serial
 import serial.tools.list_ports
 
+VERBOSE = False
+
 MEMORY_MAP = {'055': {'type': 'total_distance_m', 'size': 'double', 'base': 16},
               '140': {'type': 'total_strokes', 'size': 'double', 'base': 16},
               '088': {'type': 'watts', 'size': 'double', 'base': 16},
@@ -112,7 +114,7 @@ def ask_for_port():
     for (i, (path, name, _)) in enumerate(ports):
         print("%s. %s - %s" % (i, path, name))
         if "WR" in name:
-            print("auto-chosen: %s" % path)
+            logging.info("[*] auto-chosen: %s" % path)
             return path
     result = raw_input()
     return ports[int(result)][0]
@@ -121,10 +123,10 @@ def find_port():
     ports = serial.tools.list_ports.comports()
     for (i, (path, name, _)) in enumerate(ports):
         if "WR" in name:
-            print("serial port found: %s" % path)
+            logging.info("[*] serial port found: %s" % path)
             return path
 
-    print("serial port not found retrying in 5s")
+    logging.info("[*] serial port not found retrying in 5s")
     time.sleep(5)
     return find_port()
 
@@ -154,11 +156,11 @@ def read_reply(cmd):
         value_fn = SIZE_PARSE_MAP.get(size, lambda cmd: None)
         value = value_fn(cmd)
         if value is None:
-            logging.error('unknown size: %s', size)
+            logging.error('[-] interface.py: read_reply() -> unknown size: %s', size)
         else:
             return build_event(memory['type'], int(value, base=memory['base']), cmd)
     else:
-        logging.error('cannot read reply for %s', cmd)
+        logging.error('[-] interface.py: read_reply() -> cannot read reply for %s', cmd)
 
 
 def event_from(line):
@@ -177,6 +179,7 @@ def event_from(line):
         elif cmd == PING_RESPONSE:
             return None
         elif cmd[:1] == PULSE_COUNT_RESPONSE:
+            logging.debug('[-] interface.py: event_from() -> got event pulse count response %s', line)
             return None
         elif cmd == ERROR_RESPONSE:
             return build_event(type='error', raw=cmd)
@@ -186,7 +189,7 @@ def event_from(line):
             #AND INTERACTIVE_MODE
             return None
     except Exception as e:
-        logging.error('could not build event for: %s %s', line, e)
+        logging.error('[-] interface.py: event_from() -> could not build event for: %s %s', line, e)
 
 
 class Rower(object):
@@ -216,9 +219,9 @@ class Rower(object):
             self._serial.port = find_port()
         try:
             self._serial.open()
-            print("serial open")
+            logging.info("[*] serial open")
         except serial.SerialException as e:
-            print("serial open error waiting")
+            logging.error('[-] interface.py: _find_serial() -> serial open error waiting...')
             time.sleep(5)
             self._serial.close()
             self._find_serial()
@@ -228,7 +231,7 @@ class Rower(object):
             self._serial.close()
         self._find_serial()
         if self._stop_event.is_set():
-            print("reset threads")
+            logging.info("[*] reset threads")
             self._stop_event.clear()
             self._request_thread = build_daemon(target=self.start_requesting)
             self._capture_thread = build_daemon(target=self.start_capturing)
@@ -250,8 +253,7 @@ class Rower(object):
             self._serial.write(raw.upper() + '\r\n')
             self._serial.flush()
         except Exception as e:
-            print(e)
-            print("Serial error try to reconnect")
+            logging.error('[-] interface.py: write() -> serial error try to reconnect...', exc_info=1)
             self.open()
 
     def start_capturing(self):
@@ -261,14 +263,15 @@ class Rower(object):
                     line = self._serial.readline()
                     event = event_from(line)
                     if event:
+                        if VERBOSE == True:
+                            logging.debug('[*] interface.py: start_capturing() -> sending event ' + str(event))
                         self.notify_callbacks(event)
                 except Exception as e:
-                    print("could not read %s" % e)
+                    logging.error('[-] interface.py: start_capturing() -> could not read', exc_info=1)
                     try:
                         self._serial.reset_input_buffer()
                     except Exception as e2:
-                        print("could not reset_input_buffer %s" % e2)
-
+                        logging.error('[-] interface.py: start_capturing() -> could not reset_input_buffer', exc_info=1)
             else:
                 self._stop_event.wait(0.1)
 
@@ -291,7 +294,7 @@ class Rower(object):
             hex_duration = hex(value).split('x')[1].rjust(4, '0')
             command = '{0}{1}'.format(WORKOUT_SET_DURATION_REQUEST, hex_duration)
 
-        logging.info('sending reset and workout command: %s', command)
+        logging.info('[*] sending reset and workout command: %s', command)
         self.reset_request()
         self.notify_callbacks(build_event('workout-start'))
         self.write(command)

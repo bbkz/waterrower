@@ -1,7 +1,6 @@
 <html>
   <head>
     <link rel="stylesheet" href="{{ static_url("reset.css") }}" />
-    <link rel="stylesheet" href="{{ static_url("nv.d3.min.css") }}" />
     <link rel="stylesheet" href="{{ static_url("base.css") }}" />
   </head>
   <style>
@@ -59,22 +58,20 @@
       </div>
         <div style="display:flex">
         <div id="viz"></div>
-        <div id="chart" style="flex-grow: 1;">
-          <svg style="height:500px"> </svg>
+        <div id="chart" style="flex-grow: 1;"></div>
         </div>
         </div>
     </div>
     <script src="{{ static_url("jquery.min.js") }}"></script>
     <script src="{{ static_url("d3.min.js") }}"></script>
-    <script src="{{ static_url("nv.d3.min.js") }}"></script>
     <script src="{{ static_url("reconnecting-websocket.min.js") }}"></script>
     <script src="{{ static_url("graph.js") }}"></script>
     <script src="{{ static_url("dashboard.js") }}"></script>
     <script>
       $(function() {
-          polar.init();
+          polarchart.init();
+          linechart.init();
           dashboard.init();
-
       });
     </script>
   </body>

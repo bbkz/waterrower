@@ -1,4 +1,4 @@
-var polar = (function() {
+var polarchart = (function() {
 
     var w = 500;
     var h = 500;
@@ -10,9 +10,9 @@ var polar = (function() {
                         {name: 's/m', index: 0.3, value: 0}];
 
     var svg = null;
-    var fill = d3.scale.linear()
+    var fill = d3.scaleLinear()
         .range(["#f00", "#0f0", "#ff0"]);
-    var arc = d3.svg.arc()
+    var arc = d3.arc()
         .startAngle(0)
         .endAngle(function(d) { return d.value * 2 * Math.PI; })
         .innerRadius(function(d) { return d.index * r; })
@@ -56,6 +56,112 @@ var polar = (function() {
                     + "rotate(" + (d.value < .5 ? -90 : 90) + ")"
             })
             .text(function(d) { return d.name; });
+    }
+
+    var reset = function() {
+        update(startingData);
+    }
+
+    return {
+        init: init,
+        update: update,
+        reset: reset
+    }
+
+})();
+
+var linechart = (function() {
+    var h = 500;
+    var w = 500;
+    var s = 0.09;
+    var svg = null
+    // var startingData = [
+    //       {type: "heart_rate", time: 1586082456866, elapsed: 0, rate: 0},
+    //       {type: "heart_rate", time: 1586082461867, elapsed: 3000, rate: 40},
+    //       {type: "heart_rate", time: 1586082466867, elapsed: 8000, rate: 10},
+    //       {type: "stroke_rate", time: 1586082456866, elapsed: 0, rate: 0},
+    //       {type: "stroke_rate", time: 1586082461867, elapsed: 5000, rate: 82},
+    //       {type: "stroke_rate", time: 1586082466867, elapsed: 10000, rate: 135}
+    // ];
+    var startingData = [
+          {type: "heart_rate", elapsed: 0, rate: 0},
+          {type: "stroke_rate", elapsed: 0, rate: 0}
+    ];
+
+    var renderChart = function(selection, arrData) {
+        margin = ({top: 20, right: 30, bottom: 30, left: 40})
+
+        xValue = d => d.elapsed;
+        yValue = d => d.rate;
+        colorValue = d => d.type;
+
+        xScale = d3.scaleLinear()
+            .domain(d3.extent(arrData, xValue)).nice()
+            .range([0 + margin.left, w])
+
+        yScale = d3.scaleLinear()
+            .domain(d3.extent(arrData, yValue)).nice()
+            .range([h - margin.bottom, 0])
+
+        colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+
+        xAxis = g => g
+            .attr("transform", `translate(0,${h - margin.bottom})`)
+            .call(d3.axisBottom(xScale).ticks(w / 80).tickSizeOuter(0))
+
+        yAxis = g => g
+            .attr("transform", `translate(${margin.left},0)`)
+            .call(d3.axisLeft(yScale))
+
+        nested = d3.nest()
+            .key(colorValue)
+            .entries(arrData)
+
+        colorScale.domain(nested.map(d => d.key))
+
+        lineGenerator = d3.line()
+            .x(d => xScale(xValue(d)))
+            .y(d => yScale(yValue(d)))
+            .curve(d3.curveBasis)
+
+        selection.append("g")
+            .call(xAxis);
+
+        selection.append("g")
+            .call(yAxis);
+
+        lines = selection.selectAll(".line-path")
+               .data(nested)
+
+        // enter new data
+        lines.enter().append("path")
+            .attr("class", "line-path")
+            .attr("fill", "none")
+            .attr("stroke", d => colorScale(d.key))
+            .attr("stroke-width", 5)
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("d", d => lineGenerator(d.values));
+
+        // update data
+        lines
+            .attr("stroke", d => colorScale(d.key))
+            .attr("d", d => lineGenerator(d.values));
+
+        // handle removed data
+        lines.exit().remove()
+    }
+
+    var init = function() {
+        svg = d3.select('#chart').append("svg")
+            .attr("height", h)
+            .attr("width", w)
+        renderChart(svg, startingData)
+    }
+
+    var update = function(data) {
+        console.log(data)
+        renderChart(svg, data)
     }
 
     var reset = function() {
