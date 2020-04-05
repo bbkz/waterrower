@@ -75,14 +75,6 @@ var linechart = (function() {
     var w = 500;
     var s = 0.09;
     var svg = null
-    // var startingData = [
-    //       {type: "heart_rate", time: 1586082456866, elapsed: 0, rate: 0},
-    //       {type: "heart_rate", time: 1586082461867, elapsed: 3000, rate: 40},
-    //       {type: "heart_rate", time: 1586082466867, elapsed: 8000, rate: 10},
-    //       {type: "stroke_rate", time: 1586082456866, elapsed: 0, rate: 0},
-    //       {type: "stroke_rate", time: 1586082461867, elapsed: 5000, rate: 82},
-    //       {type: "stroke_rate", time: 1586082466867, elapsed: 10000, rate: 135}
-    // ];
     var startingData = [
           {type: "heart_rate", elapsed: 0, rate: 0},
           {type: "stroke_rate", elapsed: 0, rate: 0}
@@ -124,11 +116,11 @@ var linechart = (function() {
             .y(d => yScale(yValue(d)))
             .curve(d3.curveBasis)
 
-        selection.append("g")
-            .call(xAxis);
-
-        selection.append("g")
-            .call(yAxis);
+        // disable axis, but leave the code for now
+        // selection.append("g")
+        //     .call(xAxis);
+        // selection.append("g")
+        //     .call(yAxis);
 
         lines = selection.selectAll(".line-path")
                .data(nested)
@@ -156,11 +148,16 @@ var linechart = (function() {
         svg = d3.select('#chart').append("svg")
             .attr("height", h)
             .attr("width", w)
-        renderChart(svg, startingData)
     }
 
     var update = function(data) {
         console.log(data)
+        // filter data to kind of zoom in
+        data = data.filter(function(item, idx) {
+            // timestamp js uses ms - elapsed range in ms 60000 ms = 1 min
+            range = Date.now() - 60000;
+            return item.time >= range;
+        });
         renderChart(svg, data)
     }
 

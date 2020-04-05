@@ -91,7 +91,7 @@ class DataLogger(object):
             self._event['elapsed'] = self._event['time'] - self._activity['start_time']
             event = copy.deepcopy(self._event)
             self._events.append(event)
-            # send event data to the websocket
+            # send graph event data to the websocket
             callback_data = {
                 "type": "graph",
                 "value": event,
