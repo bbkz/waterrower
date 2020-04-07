@@ -151,7 +151,7 @@ var linechart = (function() {
     }
 
     var update = function(data) {
-        console.log(data)
+        //console.log(data)
         // filter data to kind of zoom in
         data = data.filter(function(item, idx) {
             // timestamp js uses ms - elapsed range in ms 60000 ms = 1 min
