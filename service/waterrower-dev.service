@@ -1,0 +1,15 @@
+[Unit]
+Description = Waterrower WebUI
+After = remote-fs.target network-online.target
+Wants = network-online.target
+
+[Service]
+User = pi
+Group = pi
+Type = simple
+WorkingDirectory = /opt/waterrower
+ExecStart = /usr/bin/python3 /opt/waterrower/waterrower/main.py --port=8000 --test --debug
+Restart = on-failure
+
+[Install]
+WantedBy=multi-user.target
