@@ -4,14 +4,16 @@ import threading
 import copy
 import time
 import logging
+import storage
 
 IGNORE_LIST = ['graph', 'tank_volume', 'display_hr', 'display_min', 'display_sec', 'display_sec_dec']
 
 
 class DataLogger(object):
     def __init__(self, rower_interface, config):
+        self.config = config
         self.DATAPATH = config['global']['datapath']
-        self.GOOGLE_FIT_ENABLED = config['global']['google_fit_enabled']
+        self.GOOGLE_FIT_ENABLED = config['google_fit'].getboolean('enabled')
         self.VERBOSE = False
 
         self._rower_interface = rower_interface
@@ -77,9 +79,12 @@ class DataLogger(object):
             with open(self.DATAPATH + '/workouts.json', 'w', encoding='utf-8') as f:
                 f.write(json.dumps(activities, ensure_ascii=False))
 
-            # upload your data to google fit, do you really want this?
+            # upload your data to google fit
             if self.GOOGLE_FIT_ENABLED == True:
                 save_to_google_fit(self._activity)
+            # upload to storage @todo migrate google_fit into it
+            s = storage.Storage(self.config)
+            s.save_to_nextcloud()
 
             self._activity = None
 

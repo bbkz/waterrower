@@ -45,10 +45,10 @@ if options.config:
             logging.error('[-] ', exc_info=1)
             sys.exit(1)
 else:
-    if os.path.isfile(os.path.dirname(__file__) + '/waterrower.cfg'):
+    if os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'waterrower.cfg')):
         try:
-            config.read(os.path.dirname(__file__) + '/waterrower.cfg')
-            logging.debug("[*] configuration "+os.path.dirname(__file__)+"/waterrower.cfg loaded...")
+            config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'waterrower.cfg'))
+            logging.debug("[*] configuration "+os.path.join(os.path.dirname(os.path.abspath(__file__)), 'waterrower.cfg')+" loaded...")
         except Exception as e:
             logging.error('[-] ', exc_info=1)
             sys.exit(1)
@@ -79,8 +79,8 @@ class Application(tornado.web.Application):
             (r"/", handlers.TemplateHandler),
             ]
         settings = {
-            'template_path': os.path.join(os.path.dirname(__file__), "templates"),
-            'static_path': os.path.join(os.path.dirname(__file__), "static"),
+            'template_path': os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"),
+            'static_path': os.path.join(os.path.dirname(os.path.abspath(__file__)), "static"),
             'debug': options.debug
             }
         tornado.web.Application.__init__(self, routes, **settings)
