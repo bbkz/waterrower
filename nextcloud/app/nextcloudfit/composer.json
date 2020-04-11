@@ -1,0 +1,15 @@
+{
+    "name": "Nextcloud Fit",
+    "description": "A fitness / health data collection analyzer",
+    "type": "project",
+    "license": "AGPL",
+    "authors": [
+        {
+            "name": "bbk"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^5.4"
+    }
+}

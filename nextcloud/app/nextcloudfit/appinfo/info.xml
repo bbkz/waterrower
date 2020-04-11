@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>nextcloudfit</id>
+    <name>Nextcloud Fit</name>
+    <summary>A fitness / health data collection analyzer</summary>
+    <description><![CDATA[Creates graphs out of fitness and health data.]]></description>
+    <version>0.0.1</version>
+    <licence>agpl</licence>
+    <author mail="bbk@nocloud.ch" homepage="https://nocloud.ch">bbk</author>
+    <namespace>NextcloudFit</namespace>
+    <category>tools</category>
+    <bugs>https://trac.nocloud.ch</bugs>
+    <dependencies>
+        <nextcloud min-version="15" max-version="15"/>
+    </dependencies>
+    <navigations>
+        <navigation>
+            <name>Nextcloud Fit</name>
+            <route>nextcloudfit.page.index</route>
+        </navigation>
+    </navigations>
+</info>
