@@ -5,6 +5,8 @@ import copy
 import time
 import logging
 import storage
+import asyncio
+from google_fit
 
 IGNORE_LIST = ['graph', 'tank_volume', 'display_hr', 'display_min', 'display_sec', 'display_sec_dec']
 
@@ -81,7 +83,12 @@ class DataLogger(object):
 
             # upload your data to google fit
             if self.GOOGLE_FIT_ENABLED == True:
-                save_to_google_fit(self._activity)
+                try:
+                    if not self._rower_interface._demo:
+                        google_fit.post_activity(self._activity)
+                except Exception as e:
+                    logging.error('[-] logger.py: end_activity() -> ', exc_info=1)
+
             # upload to storage @todo migrate google_fit into it
             s = storage.Storage(self.config)
             s.save_to_nextcloud()
@@ -89,6 +96,7 @@ class DataLogger(object):
             self._activity = None
 
     def _save_event(self):
+        asyncio.set_event_loop(asyncio.new_event_loop())
         while not self._stop_event.is_set():
             #TODO keep track of max?
             #TODO keep track of history?
@@ -108,87 +116,3 @@ class DataLogger(object):
             self._rower_interface.notify_callbacks(callback_data)
             self._event = {}
             self._stop_event.wait(5)
-
-
-def save_to_google_fit(activity):
-    try:
-        with open(self.DATAPATH + '/google_fit_config.json') as data_file:
-            config = json.load(data_file)
-            from oauth2client import GOOGLE_REVOKE_URI
-            from oauth2client import GOOGLE_TOKEN_URI
-            from oauth2client.client import OAuth2Credentials
-            from apiclient import discovery
-            import httplib2
-
-            credentials = OAuth2Credentials(None, config['CLIENT_ID'],
-                               config['CLIENT_SECRET'], config['REFRESH_TOKEN'], None,
-                               GOOGLE_TOKEN_URI, None,
-                               revoke_uri=GOOGLE_REVOKE_URI,
-                               id_token=None,
-                               token_response=None)
-            http_auth = credentials.authorize(httplib2.Http())
-            fit_service = discovery.build('fitness', 'v1', http_auth)
-            #TODO check that datasources exists
-
-            start_time = activity['start_time'] * 1000000
-            end_time = activity['end_time'] * 1000000
-
-            body = {
-             "dataSourceId": "raw:com.google.activity.segment:197772635046:waterrower:S4:1",
-             "maxEndTimeNs": end_time,
-             "minStartTimeNs": start_time,
-             "point": [
-              {
-               "dataTypeName": "com.google.activity.segment",
-               "endTimeNanos": end_time,
-               "startTimeNanos": start_time,
-               "value": [
-                {
-                 "intVal": 103
-                }
-               ]
-              }
-             ]
-            }
-
-            print(fit_service.users().dataSources().datasets().patch(userId="me",
-                    dataSourceId="raw:com.google.activity.segment:197772635046:waterrower:S4:1",
-                    datasetId="%s-%s" % (start_time, end_time), body=body).execute())
-
-            body = {
-             "dataSourceId": "raw:com.google.distance.delta:197772635046:waterrower:S4:1",
-             "maxEndTimeNs": end_time,
-             "minStartTimeNs": start_time,
-             "point": [
-              {
-               "dataTypeName": "com.google.distance.delta",
-               "endTimeNanos": end_time,
-               "startTimeNanos": start_time,
-               "value": [
-                {
-                 "fpVal": activity['total_distance_m']
-                }
-               ]
-              }
-             ]
-            }
-
-            print(fit_service.users().dataSources().datasets().patch(userId="me",
-                    dataSourceId="raw:com.google.distance.delta:197772635046:waterrower:S4:1",
-                    datasetId="%s-%s" % (start_time, end_time), body=body).execute())
-
-            body = {
-             "activityType": 103,
-             "application": {
-              "name": "waterrower"
-             },
-             "endTimeMillis":  activity['end_time'],
-             "id": "ergo_%s" % activity['start_time'],
-             "name": "Ergo rowing",
-             "startTimeMillis": activity['start_time']
-            }
-            print(fit_service.users().sessions().update(userId="me", sessionId="ergo_%s" % activity['start_time'],
-                                                        body=body).execute())
-
-    except Exception as e:
-        logging.error('[-] logger.py: save_to_google_fit() -> ', exc_info=1)

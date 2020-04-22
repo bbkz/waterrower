@@ -102,3 +102,6 @@ class FakeS4(object):
 
     def flush(self):
         pass
+
+    def reset_input_buffer(self):
+        pass

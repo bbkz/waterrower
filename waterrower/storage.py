@@ -3,7 +3,6 @@ import sys
 import os
 import logging
 import json
-import owncloud
 from urllib.error import HTTPError
 
 class Storage(object):
@@ -18,6 +17,7 @@ class Storage(object):
 
     def save_to_nextcloud(self):
         if self.NEXTCLOUD_ENABLED == True:
+            import owncloud
             # login to nextcloud
             try:
                 oc = owncloud.Client(self.NEXTCLOUD_URL)

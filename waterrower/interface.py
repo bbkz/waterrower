@@ -4,6 +4,7 @@ import logging
 import time
 import serial
 import serial.tools.list_ports
+import asyncio
 
 VERBOSE = False
 
@@ -107,7 +108,6 @@ SIZE_PARSE_MAP = {'single': lambda cmd: cmd[6:8],
                   'triple': lambda cmd: cmd[6:12]}
 
 
-
 def ask_for_port():
     print("Choose a serial port to use:")
     ports = serial.tools.list_ports.comports()
@@ -116,8 +116,9 @@ def ask_for_port():
         if "WR" in name:
             logging.info("[*] auto-chosen: %s" % path)
             return path
-    result = raw_input()
+    result = input()
     return ports[int(result)][0]
+
 
 def find_port():
     ports = serial.tools.list_ports.comports()
@@ -200,6 +201,7 @@ class Rower(object):
         if options and options.demo:
             from demo import FakeS4
             self._serial = FakeS4()
+            self._serial.open()
             self._demo = True
         else:
             self._serial = serial.Serial()
@@ -257,6 +259,7 @@ class Rower(object):
             self.open()
 
     def start_capturing(self):
+        asyncio.set_event_loop(asyncio.new_event_loop())
         while not self._stop_event.is_set():
             if self._serial.isOpen():
                 try:
@@ -276,6 +279,7 @@ class Rower(object):
                 self._stop_event.wait(0.1)
 
     def start_requesting(self):
+        asyncio.set_event_loop(asyncio.new_event_loop())
         while not self._stop_event.is_set():
             if self._serial.isOpen():
                 for address in MEMORY_MAP:
