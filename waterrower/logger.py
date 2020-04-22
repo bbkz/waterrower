@@ -6,7 +6,7 @@ import time
 import logging
 import storage
 import asyncio
-from google_fit
+import google_fit
 
 IGNORE_LIST = ['graph', 'tank_volume', 'display_hr', 'display_min', 'display_sec', 'display_sec_dec']
 
