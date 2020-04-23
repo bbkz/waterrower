@@ -79,7 +79,7 @@ dashboard = (function($) {
             }
             if(data.value.stroke_rate > 0){
                 // manipulate data for visualization - factor of stroke_rate
-                chart_series.push({type: "stroke_rate" || 0, time: data.value.time || 0, elapsed: data.value.elapsed || 0, rate: data.value.stroke_rate + 80 || 0});
+                chart_series.push({type: "stroke_rate" || 0, time: data.value.time || 0, elapsed: data.value.elapsed || 0, rate: data.value.stroke_rate || 0});
             }
             // send d3 nest compatible data
             linechart.update(chart_series)
