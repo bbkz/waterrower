@@ -12,13 +12,13 @@ initial base is a fork from https://github.com/gar3thjon3s/rower and is inspired
 It uses python3 the python libraries needed to run are stated in the requirements.txt file. But here are some packages that i installed on raspbian 10 "buster":
 
 ```
-sudo apt install python3-pip python3-serial python3-oauth2client python3-tornado #python3-tornado4 (raspbian)
+sudo apt install python3-pip python3-serial python3-oauth2client
 ```
 
 For uploading to nextcloud:
 
 ```
-sudo pip3 install pyocclient google-api-python-client
+sudo pip3 install tornado pyocclient google-api-python-client
 ```
 
 ## Testing
