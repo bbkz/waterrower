@@ -76,8 +76,8 @@ var linechart = (function() {
     var s = 0.09;
     var svg = null
     var startingData = [
-          {type: "heart_rate", elapsed: 0, rate: 0},
-          {type: "stroke_rate", elapsed: 0, rate: 0}
+          {type: "heart_rate", time: 0, elapsed: 0, rate: 0},
+          {type: "stroke_rate", time: 0, elapsed: 0, rate: 0}
     ];
 
     var renderChart = function(selection, arrData) {
