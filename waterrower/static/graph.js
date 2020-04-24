@@ -71,92 +71,119 @@ var polarchart = (function() {
 })();
 
 var linechart = (function() {
+    // var h = $('#chart').height();
+    // var w = $('#chart').width();
     var h = 500;
-    var w = 500;
-    var s = 0.09;
+    var w = 800;
     var svg = null
     var startingData = [
-          {type: "heart_rate", time: 0, elapsed: 0, rate: 0},
-          {type: "stroke_rate", time: 0, elapsed: 0, rate: 0}
+      {stroke_rate: 0, heart_rate: 0, total_distance_m: 0, total_strokes: 0, avg_distance_cmps: 0, time: 0, elapsed: 0}
     ];
 
     var renderChart = function(selection, arrData) {
         margin = ({top: 20, right: 30, bottom: 30, left: 40})
 
         xValue = d => d.elapsed;
-        yValue = d => d.rate;
-        colorValue = d => d.type;
+        yValue1 = d => d.stroke_rate;
+        yValue2 = d => d.heart_rate;
 
         xScale = d3.scaleLinear()
             .domain(d3.extent(arrData, xValue)).nice()
             .range([0 + margin.left, w])
-
-        yScale = d3.scaleLinear()
-            .domain(d3.extent(arrData, yValue)).nice()
+        yScale1 = d3.scaleLinear()
+            .domain(d3.extent(arrData, yValue1)).nice()
+            .range([h - margin.bottom, 0])
+        yScale2 = d3.scaleLinear()
+            .domain(d3.extent(arrData, yValue2)).nice()
             .range([h - margin.bottom, 0])
 
-        colorScale = d3.scaleOrdinal(d3.schemeCategory10)
-
+        // axis
+        //
+        // create axisgenerators
         xAxis = g => g
             .attr("transform", `translate(0,${h - margin.bottom})`)
-            .call(d3.axisBottom(xScale).ticks(w / 80).tickSizeOuter(0))
-
-        yAxis = g => g
+            .call(d3.axisBottom(xScale))
+        yAxis1 = g => g
             .attr("transform", `translate(${margin.left},0)`)
-            .call(d3.axisLeft(yScale))
+            .call(d3.axisLeft(yScale1))
+        yAxis2 = g => g
+            .attr("transform", `translate(${w - margin.right}, 0)`)
+            .call(d3.axisRight(yScale2))
 
-        nested = d3.nest()
-            .key(colorValue)
-            .entries(arrData)
+        // add data to the axis
+        selection.selectAll(".xaxis")
+            .call(xAxis);
+        selection.selectAll(".y1axis")
+            .call(yAxis1);
+        selection.selectAll(".y2axis")
+            .call(yAxis2);
 
-        colorScale.domain(nested.map(d => d.key))
-
-        lineGenerator = d3.line()
+        // lines
+        //
+        // create linegenerators
+        lineGenerator1 = d3.line()
             .x(d => xScale(xValue(d)))
-            .y(d => yScale(yValue(d)))
+            .y(d => yScale1(yValue1(d)))
+            .curve(d3.curveBasis)
+        lineGenerator2 = d3.line()
+            .x(d => xScale(xValue(d)))
+            .y(d => yScale2(yValue2(d)))
             .curve(d3.curveBasis)
 
-        // disable axis, but leave the code for now
-        // selection.append("g")
-        //     .call(xAxis);
-        // selection.append("g")
-        //     .call(yAxis);
+        // add data to the lines
+        //
+        // line selection
+        line1 = selection.selectAll(".line-path1")
+        line2 = selection.selectAll(".line-path2")
 
-        lines = selection.selectAll(".line-path")
-               .data(nested)
+        // line update data
+        line1.attr("d", d => lineGenerator1(arrData));
+        line2.attr("d", d => lineGenerator2(arrData));
 
-        // enter new data
-        lines.enter().append("path")
-            .attr("class", "line-path")
-            .attr("fill", "none")
-            .attr("stroke", d => colorScale(d.key))
-            .attr("stroke-width", 5)
-            .attr("stroke-linejoin", "round")
-            .attr("stroke-linecap", "round")
-            .attr("d", d => lineGenerator(d.values));
+        // line on enter new data
+        line1.enter().selectAll("line-path1")
+            .attr("d", d => lineGenerator1(arrData));
+        line2.enter().selectAll("line-path2")
+            .attr("d", d => lineGenerator2(arrData));
 
-        // update data
-        lines
-            .attr("stroke", d => colorScale(d.key))
-            .attr("d", d => lineGenerator(d.values));
-
-        // handle removed data
-        lines.exit().remove()
+        // line handle removed data
+        line1.exit().remove()
+        line2.exit().remove()
     }
 
     var init = function() {
+        // create containers
         svg = d3.select('#chart').append("svg")
             .attr("height", h)
             .attr("width", w)
+        svg.append("g")
+            .attr("class", "xaxis")
+        svg.append("g")
+            .attr("class", "y1axis")
+        svg.append("g")
+            .attr("class", "y2axis")
+        svg.append("path")
+            .attr("class", "line-path1")
+            .attr("fill", "none")
+            .attr("stroke", "orange")
+            .attr("stroke-width", 5)
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+        svg.append("path")
+            .attr("class", "line-path2")
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-width", 5)
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
     }
 
     var update = function(data) {
-        //console.log(data)
-        // filter data to kind of zoom in
+        // filter array data to kind of zoom in
         data = data.filter(function(item, idx) {
             // timestamp js uses ms - elapsed range in ms 60000 ms = 1 min
             range = Date.now() - 60000;
-            return item.time >= range;
+            return item.time >= range && item.stroke_rate != 0 && item.heart_rate != 0;
         });
         renderChart(svg, data)
     }

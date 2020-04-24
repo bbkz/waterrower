@@ -6,8 +6,6 @@ dashboard = (function($) {
     var timerId = null;
     var workoutDistance = 0;
     var workoutDuration = 0;
-    var heart_rate = [];
-    // d3 nest compatible
     var chart_series = []
 
     // handle callbacks from interface.py and other sources (ui)
@@ -70,19 +68,20 @@ dashboard = (function($) {
 
         },
         graph: function(data){
-            if(data.verbose == true){
-                console.log(data)
-            }
-            // Update the SVG with the new data and call chart - prevent 0 mesures
-            if(data.value.heart_rate > 0){
-                chart_series.push({type: "heart_rate" || 0, time: data.value.time || 0, elapsed: data.value.elapsed || 0, rate: data.value.heart_rate || 0});
-            }
-            if(data.value.stroke_rate > 0){
-                // manipulate data for visualization - factor of stroke_rate
-                chart_series.push({type: "stroke_rate" || 0, time: data.value.time || 0, elapsed: data.value.elapsed || 0, rate: data.value.stroke_rate || 0});
-            }
-            // send d3 nest compatible data
-            linechart.update(chart_series)
+          if(data.verbose == true){
+            console.log(data)
+          }
+          // update the line chart with the new dataset
+          row = []
+          row.time = data.value.time || 0
+          row.elapsed = data.value.elapsed || 0
+          row.stroke_rate = data.value.stroke_rate || 0
+          row.heart_rate = data.value.heart_rate || 0
+          row.total_distance_m = data.total_distance_m || 0
+          row.avg_distance_cmps = data.avg_distance_cmps || 0
+          row.total_strokes = data.total_strokes || 0
+          chart_series.push(row)
+          linechart.update(chart_series) // send the new complete dataset to generate graph
         }
     };
 
