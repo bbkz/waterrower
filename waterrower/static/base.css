@@ -103,10 +103,10 @@ dl#clock dd, dl#split dd {
     margin-left: 10px;
 }
 
-#viz {
+#polarchart {
     text-align: center;
 }
 
-#viz text {
+#polarchart text {
     fill: white;
 }
