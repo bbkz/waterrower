@@ -1,5 +1,4 @@
 var polarchart = (function() {
-
     var w = 500;
     var h = 500;
     var r = Math.min(w,h) / 1;
@@ -71,17 +70,15 @@ var polarchart = (function() {
 })();
 
 var linechart = (function() {
-    // var h = $('#chart').height();
-    // var w = $('#chart').width();
-    var h = 500;
-    var w = 800;
     var svg = null
     var startingData = [
       {stroke_rate: 0, heart_rate: 0, total_distance_m: 0, total_strokes: 0, avg_distance_cmps: 0, time: 0, elapsed: 0}
     ];
 
     var renderChart = function(selection, arrData) {
-        margin = ({top: 20, right: 30, bottom: 30, left: 40})
+        margin = ({top: 20, right: 30, bottom: 20, left: 30})
+        h = parseInt(selection.style('height'), 10);
+        w = parseInt(selection.style('width'), 10),
 
         xValue = d => d.elapsed;
         yValue1 = d => d.stroke_rate;
@@ -89,13 +86,13 @@ var linechart = (function() {
 
         xScale = d3.scaleLinear()
             .domain(d3.extent(arrData, xValue)).nice()
-            .range([0 + margin.left, w])
+            .range([0 + margin.left, w - margin.right])
         yScale1 = d3.scaleLinear()
             .domain(d3.extent(arrData, yValue1)).nice()
-            .range([h - margin.bottom, 0])
+            .range([h - margin.bottom, 0 + margin.top])
         yScale2 = d3.scaleLinear()
             .domain(d3.extent(arrData, yValue2)).nice()
-            .range([h - margin.bottom, 0])
+            .range([h - margin.bottom, 0 + margin.top])
 
         // axis
         //
@@ -154,8 +151,8 @@ var linechart = (function() {
     var init = function() {
         // create containers
         svg = d3.select('#chart').append("svg")
-            .attr("height", h)
-            .attr("width", w)
+            .attr("height", "100%")
+            .attr("width", "100%")
         svg.append("g")
             .attr("class", "xaxis")
         svg.append("g")
@@ -165,14 +162,14 @@ var linechart = (function() {
         svg.append("path")
             .attr("class", "line-path1")
             .attr("fill", "none")
-            .attr("stroke", "orange")
+            .attr("stroke", "steelblue")
             .attr("stroke-width", 5)
             .attr("stroke-linejoin", "round")
             .attr("stroke-linecap", "round")
         svg.append("path")
             .attr("class", "line-path2")
             .attr("fill", "none")
-            .attr("stroke", "steelblue")
+            .attr("stroke", "orange")
             .attr("stroke-width", 5)
             .attr("stroke-linejoin", "round")
             .attr("stroke-linecap", "round")
