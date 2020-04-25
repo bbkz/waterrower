@@ -124,10 +124,10 @@ def find_port():
     ports = serial.tools.list_ports.comports()
     for (i, (path, name, _)) in enumerate(ports):
         if "WR" in name:
-            logging.info("[*] serial port found: %s" % path)
+            logging.info("[*] interface.py: find_port() ->  serial port found: %s" % path)
             return path
 
-    logging.info("[*] serial port not found retrying in 5s")
+    logging.info("[*] interface.py: find_port() ->  serial port not found retrying in 5s")
     time.sleep(5)
     return find_port()
 
@@ -167,6 +167,7 @@ def read_reply(cmd):
 def event_from(line):
     try:
         cmd = line.strip()
+        cmd = cmd.decode()
         if cmd == STROKE_START_RESPONSE:
             return build_event(type='stroke_start', raw=cmd)
         elif cmd == STROKE_END_RESPONSE:
@@ -180,7 +181,7 @@ def event_from(line):
         elif cmd == PING_RESPONSE:
             return None
         elif cmd[:1] == PULSE_COUNT_RESPONSE:
-            logging.debug('[-] interface.py: event_from() -> got event pulse count response %s', line)
+            logging.debug('[*] interface.py: event_from() -> got event pulse count response %s', line)
             return None
         elif cmd == ERROR_RESPONSE:
             return build_event(type='error', raw=cmd)
@@ -220,10 +221,11 @@ class Rower(object):
         if not self._demo:
             self._serial.port = find_port()
         try:
+            logging.debug("[*] interface.py: _find_serial() -> " + str(self._serial))
             self._serial.open()
-            logging.info("[*] serial open")
+            logging.info("[*] interface.py: _find_serial() -> serial open")
         except serial.SerialException as e:
-            logging.error('[-] interface.py: _find_serial() -> serial open error waiting...')
+            logging.error('[-] interface.py: _find_serial() -> serial open error waiting...', exc_info=1)
             time.sleep(5)
             self._serial.close()
             self._find_serial()
@@ -233,7 +235,7 @@ class Rower(object):
             self._serial.close()
         self._find_serial()
         if self._stop_event.is_set():
-            logging.info("[*] reset threads")
+            logging.info("[*] interface.py: open() ->  reset threads")
             self._stop_event.clear()
             self._request_thread = build_daemon(target=self.start_requesting)
             self._capture_thread = build_daemon(target=self.start_capturing)
@@ -252,7 +254,9 @@ class Rower(object):
 
     def write(self, raw):
         try:
-            self._serial.write(raw.upper() + '\r\n')
+            msg = raw.upper() + '\r\n'
+            b = msg.encode('utf-8')
+            self._serial.write(b)
             self._serial.flush()
         except Exception as e:
             logging.error('[-] interface.py: write() -> serial error try to reconnect...', exc_info=1)
