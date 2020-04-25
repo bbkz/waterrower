@@ -68,7 +68,7 @@ dashboard = (function($) {
 
         },
         graph: function(data){
-          if(data.verbose == true){
+          if(data.verbose === true){
             console.log(data)
           }
           // update the line chart with the new dataset
@@ -85,6 +85,7 @@ dashboard = (function($) {
         }
     };
 
+    // gather data for polar chart and update graph
     function updatePolarChart() {
         var data = [];
         var strokeRate = parseInt($('#stroke-rate').text());
