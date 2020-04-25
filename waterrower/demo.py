@@ -80,6 +80,7 @@ class FakeS4(object):
         return self.__queue.get()
 
     def write(self, s):
+        s = s.decode()
         if s.strip() == MODEL_INFORMATION_REQUEST:
             self.__publish(MODEL_INFORMATION_RESPONSE + '40200')
         if s[3:6] == '0A9': # tank_water config
