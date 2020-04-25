@@ -67,11 +67,11 @@ dashboard = (function($) {
         'workout-start': function(data){ //??
 
         },
+        // update the line chart with the new dataset
         graph: function(data){
           if(data.verbose === true){
             console.log(data);
           }
-          // update the line chart with the new dataset
           row = [];
           row.time = data.value.time || 0;
           row.elapsed = data.value.elapsed || 0;
@@ -85,7 +85,7 @@ dashboard = (function($) {
         }
     };
 
-    // gather data for polar chart and update graph
+    // update the polar chart, gathering data
     function updatePolarChart() {
         var data = [];
         var strokeRate = parseInt($('#stroke-rate').text());

@@ -1,6 +1,7 @@
 var polarchart = (function() {
-    var w = 500;
-    var h = 500;
+    h = parseInt(d3.select("#polarchart").style('height'), 10);
+    w = parseInt(d3.select("#polarchart").style('width'), 10);
+
     var r = Math.min(w,h) / 1;
     var s = 0.09;
 
@@ -78,7 +79,7 @@ var linechart = (function() {
     var renderChart = function(selection, arrData) {
         margin = ({top: 20, right: 30, bottom: 20, left: 30})
         h = parseInt(selection.style('height'), 10);
-        w = parseInt(selection.style('width'), 10),
+        w = parseInt(selection.style('width'), 10);
 
         xValue = d => d.elapsed;
         yValue1 = d => d.stroke_rate;
