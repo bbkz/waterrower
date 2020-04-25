@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import threading
 import logging
 import time
@@ -166,8 +165,7 @@ def read_reply(cmd):
 
 def event_from(line):
     try:
-        cmd = line.strip()
-        cmd = cmd.decode()
+        cmd = line.strip().decode()
         if cmd == STROKE_START_RESPONSE:
             return build_event(type='stroke_start', raw=cmd)
         elif cmd == STROKE_END_RESPONSE:
@@ -254,8 +252,7 @@ class Rower(object):
 
     def write(self, raw):
         try:
-            msg = raw.upper() + '\r\n'
-            b = msg.encode('utf-8')
+            b = (raw.upper() + '\r\n').encode('utf-8')
             self._serial.write(b)
             self._serial.flush()
         except Exception as e:
