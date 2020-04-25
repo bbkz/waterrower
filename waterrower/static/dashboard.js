@@ -69,19 +69,19 @@ dashboard = (function($) {
         },
         graph: function(data){
           if(data.verbose === true){
-            console.log(data)
+            console.log(data);
           }
           // update the line chart with the new dataset
-          row = []
-          row.time = data.value.time || 0
-          row.elapsed = data.value.elapsed || 0
-          row.stroke_rate = data.value.stroke_rate || 0
-          row.heart_rate = data.value.heart_rate || 0
-          row.total_distance_m = data.total_distance_m || 0
-          row.avg_distance_cmps = data.avg_distance_cmps || 0
-          row.total_strokes = data.total_strokes || 0
-          chart_series.push(row)
-          linechart.update(chart_series) // send the new complete dataset to generate graph
+          row = [];
+          row.time = data.value.time || 0;
+          row.elapsed = data.value.elapsed || 0;
+          row.stroke_rate = data.value.stroke_rate || 0;
+          row.heart_rate = data.value.heart_rate || 0;
+          row.total_distance_m = data.total_distance_m || 0;
+          row.avg_distance_cmps = data.avg_distance_cmps || 0;
+          row.total_strokes = data.total_strokes || 0;
+          chart_series.push(row);
+          linechart.update(chart_series); // send the new complete dataset to generate graph
         }
     };
 

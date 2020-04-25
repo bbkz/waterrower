@@ -18,7 +18,7 @@ var polarchart = (function() {
         .outerRadius(function(d) { return (d.index + s) * r; });
 
     var init = function() {
-        svg = d3.select("#viz").append("svg")
+        svg = d3.select("#polarchart").append("svg")
             .attr("width", w)
             .attr("height", h)
             .append("g")
@@ -86,26 +86,26 @@ var linechart = (function() {
 
         xScale = d3.scaleLinear()
             .domain(d3.extent(arrData, xValue)).nice()
-            .range([0 + margin.left, w - margin.right])
+            .range([0 + margin.left, w - margin.right]);
         yScale1 = d3.scaleLinear()
             .domain(d3.extent(arrData, yValue1)).nice()
-            .range([h - margin.bottom, 0 + margin.top])
+            .range([h - margin.bottom, 0 + margin.top]);
         yScale2 = d3.scaleLinear()
             .domain(d3.extent(arrData, yValue2)).nice()
-            .range([h - margin.bottom, 0 + margin.top])
+            .range([h - margin.bottom, 0 + margin.top]);
 
         // axis
         //
         // create axisgenerators
         xAxis = g => g
             .attr("transform", `translate(0,${h - margin.bottom})`)
-            .call(d3.axisBottom(xScale))
+            .call(d3.axisBottom(xScale));
         yAxis1 = g => g
             .attr("transform", `translate(${margin.left},0)`)
-            .call(d3.axisLeft(yScale1))
+            .call(d3.axisLeft(yScale1));
         yAxis2 = g => g
             .attr("transform", `translate(${w - margin.right}, 0)`)
-            .call(d3.axisRight(yScale2))
+            .call(d3.axisRight(yScale2));
 
         // add data to the axis
         selection.selectAll(".xaxis")
@@ -121,17 +121,17 @@ var linechart = (function() {
         lineGenerator1 = d3.line()
             .x(d => xScale(xValue(d)))
             .y(d => yScale1(yValue1(d)))
-            .curve(d3.curveBasis)
+            .curve(d3.curveBasis);
         lineGenerator2 = d3.line()
             .x(d => xScale(xValue(d)))
             .y(d => yScale2(yValue2(d)))
-            .curve(d3.curveBasis)
+            .curve(d3.curveBasis);
 
         // add data to the lines
         //
         // line selection
-        line1 = selection.selectAll(".line-path1")
-        line2 = selection.selectAll(".line-path2")
+        line1 = selection.selectAll(".line-path1");
+        line2 = selection.selectAll(".line-path2");
 
         // line update data
         line1.attr("d", d => lineGenerator1(arrData));
@@ -144,35 +144,35 @@ var linechart = (function() {
             .attr("d", d => lineGenerator2(arrData));
 
         // line handle removed data
-        line1.exit().remove()
-        line2.exit().remove()
+        line1.exit().remove();
+        line2.exit().remove();
     }
 
     var init = function() {
         // create containers
         svg = d3.select('#chart').append("svg")
             .attr("height", "100%")
-            .attr("width", "100%")
+            .attr("width", "100%");
         svg.append("g")
-            .attr("class", "xaxis")
+            .attr("class", "xaxis");
         svg.append("g")
-            .attr("class", "y1axis")
+            .attr("class", "y1axis");
         svg.append("g")
-            .attr("class", "y2axis")
+            .attr("class", "y2axis");
         svg.append("path")
             .attr("class", "line-path1")
             .attr("fill", "none")
             .attr("stroke", "steelblue")
             .attr("stroke-width", 5)
             .attr("stroke-linejoin", "round")
-            .attr("stroke-linecap", "round")
+            .attr("stroke-linecap", "round");
         svg.append("path")
             .attr("class", "line-path2")
             .attr("fill", "none")
             .attr("stroke", "orange")
             .attr("stroke-width", 5)
             .attr("stroke-linejoin", "round")
-            .attr("stroke-linecap", "round")
+            .attr("stroke-linecap", "round");
     }
 
     var update = function(data) {
