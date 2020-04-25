@@ -150,7 +150,7 @@ var linechart = (function() {
 
     var init = function() {
         // create containers
-        svg = d3.select('#chart').append("svg")
+        svg = d3.select('#linechart').append("svg")
             .attr("height", "100%")
             .attr("width", "100%");
         svg.append("g")
