@@ -186,11 +186,12 @@ dashboard = (function($) {
         ws.onerror = onerror;
         timerId = setInterval(updatePolarChart, 100);
 
+        setWTypeClass();
         $('#time-workout').click(function() {
-          setWTypeClass()
+          setWTypeClass();
         });
         $('#distance-workout').click(function() {
-          setWTypeClass()
+          setWTypeClass();
         });
 
         $('#workout-action').click(function() {
@@ -202,7 +203,7 @@ dashboard = (function($) {
             ws.send(msg);
             workoutAction.prop("checked", false);
             $(this).toggleClass('w3-khaki');
-            $("#workout-action-txt").text("Start")
+            $("#workout-action-txt").text("Start");
             return false;
           } else {
             // workout was stopped
@@ -226,7 +227,7 @@ dashboard = (function($) {
                 }});
               ws.send(msg);
               $(this).toggleClass('w3-khaki');
-              $("#workout-action-txt").text("Stop")
+              $("#workout-action-txt").text("Stop");
               workoutAction.prop("checked", true);
               return true;
             }
