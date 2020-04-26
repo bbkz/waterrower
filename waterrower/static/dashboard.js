@@ -61,9 +61,7 @@ dashboard = (function($) {
             $('#heart_rate').text(data.value);
         },
         reset: function(data){
-            chart_series.length = 0;
-            polarchart.reset();
-            linechart.reset();
+            resetGraph();
         },
         'workout-start': function(data){ //??
 
@@ -119,6 +117,12 @@ dashboard = (function($) {
         polarchart.update(data);
     }
 
+    function resetGraph() {
+        chart_series.length = 0;
+        polarchart.reset();
+        linechart.reset();
+    }
+
     function pad(n, len) {
         var result = String(n);
         while (result.length < len) {
@@ -162,6 +166,18 @@ dashboard = (function($) {
         return parseInt(value);
     }
 
+    function setWTypeClass() {
+      var type = $('input[name="workout-type"]:checked').val();
+      if (type === "WSU") {
+        $('#distance-workout').addClass("w3-khaki")
+        $('#time-workout').removeClass("w3-khaki")
+      }
+      if (type === "WSI") {
+        $('#time-workout').addClass("w3-khaki")
+        $('#distance-workout').removeClass("w3-khaki")
+      }
+    }
+
     function init() {
         ws = new ReconnectingWebSocket('ws://' +document.location.host +'/ws');
         ws.onopen = onopen;
@@ -170,38 +186,54 @@ dashboard = (function($) {
         ws.onerror = onerror;
         timerId = setInterval(updatePolarChart, 100);
 
-        $('#workout-begin').click(function() {
-            var workoutTarget = $('#workout-target').val();
-            var type = $('#workout-type').val();
-            // support radio button layout
-            if (!type) {
-              var type = $('input[name="workout-type"]:checked').val();
-            }
-            console.log(type)
-            if (!isNaN(workoutTarget) && type) {
-                workoutTarget = parseInt(workoutTarget);
-                if (type === "WSU") {
-                    workoutTarget *= 60;
-                    workoutDuration = workoutTarget;
-                }
-                if (type === "WSI") {
-                    workoutDistance = workoutTarget;
-                }
-                polarchart.reset();
-                var msg = JSON.stringify({type: 'workout-begin',
-                    value: {
-                        type: type,
-                        target: workoutTarget
-                    }});
-                ws.send(msg);
-            }
-            return false;
+        $('#time-workout').click(function() {
+          setWTypeClass()
+        });
+        $('#distance-workout').click(function() {
+          setWTypeClass()
         });
 
-        $('#workout-end').click(function() {
+        $('#workout-action').click(function() {
+          var workoutAction = $('#workout-action-value');
+          if ($(workoutAction).prop("checked")) {
+            // workout was running
+            // console.log("workout was running")
             var msg = JSON.stringify({type: 'workout-end'});
             ws.send(msg);
+            workoutAction.prop("checked", false);
+            $(this).toggleClass('w3-khaki');
+            $("#workout-action-txt").text("Start")
             return false;
+          } else {
+            // workout was stopped
+            // console.log("workout was stopped")
+            var workoutTarget = $('#workout-target').val();
+            var type = $('input[name="workout-type"]:checked').val();
+            if (!isNaN(workoutTarget) && $.isNumeric(workoutTarget) && type) {
+              workoutTarget = parseInt(workoutTarget);
+              if (type === "WSU") {
+                workoutTarget *= 60;
+                workoutDuration = workoutTarget;
+              }
+              if (type === "WSI") {
+                workoutDistance = workoutTarget;
+              }
+              resetGraph();
+              var msg = JSON.stringify({type: 'workout-begin',
+                value: {
+                  type: type,
+                  target: workoutTarget
+                }});
+              ws.send(msg);
+              $(this).toggleClass('w3-khaki');
+              $("#workout-action-txt").text("Stop")
+              workoutAction.prop("checked", true);
+              return true;
+            }
+            // console.log("could not start workout");
+            workoutAction.prop("checked", false);
+            return false;
+          }
         });
     }
 
