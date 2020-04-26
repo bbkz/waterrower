@@ -61,8 +61,9 @@ dashboard = (function($) {
             $('#heart_rate').text(data.value);
         },
         reset: function(data){
-            polarchart.reset();
             chart_series.length = 0;
+            polarchart.reset();
+            linechart.reset();
         },
         'workout-start': function(data){ //??
 
@@ -172,6 +173,11 @@ dashboard = (function($) {
         $('#workout-begin').click(function() {
             var workoutTarget = $('#workout-target').val();
             var type = $('#workout-type').val();
+            // support radio button layout
+            if (!type) {
+              var type = $('input[name="workout-type"]:checked').val();
+            }
+            console.log(type)
             if (!isNaN(workoutTarget) && type) {
                 workoutTarget = parseInt(workoutTarget);
                 if (type === "WSU") {
