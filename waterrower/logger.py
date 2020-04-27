@@ -16,7 +16,7 @@ class DataLogger(object):
         self.config = config
         self.DATAPATH = config['global']['datapath']
         self.GOOGLE_FIT_ENABLED = config['google_fit'].getboolean('enabled')
-        self.VERBOSE = False
+        self.VERBOSE = config['global'].getboolean('verbose')
 
         self._rower_interface = rower_interface
         self._rower_interface.register_callback(self.on_rower_event)
