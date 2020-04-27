@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import threading
 import random
 import queue
@@ -27,7 +26,7 @@ class FakeS4(object):
         self.__workout_target = None
 
     def __publish(self, s):
-        self.__queue.put(s.upper() + '\r\n')
+        self.__queue.put((s.upper() + '\r\n').encode('utf-8'))
 
     def generate(self):
         i = 0
@@ -81,6 +80,7 @@ class FakeS4(object):
         return self.__queue.get()
 
     def write(self, s):
+        s = s.decode()
         if s.strip() == MODEL_INFORMATION_REQUEST:
             self.__publish(MODEL_INFORMATION_RESPONSE + '40200')
         if s[3:6] == '0A9': # tank_water config

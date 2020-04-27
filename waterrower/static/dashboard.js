@@ -61,60 +61,61 @@ dashboard = (function($) {
             $('#heart_rate').text(data.value);
         },
         reset: function(data){
-            polarchart.reset();
-            chart_series.length = 0;
+            resetGraph();
         },
         'workout-start': function(data){ //??
 
         },
+        // update the line chart with the new dataset
         graph: function(data){
-          if(data.verbose == true){
-            console.log(data)
+          if(data.verbose === true){
+            console.log(data);
           }
-          // update the line chart with the new dataset
-          row = []
-          row.time = data.value.time || 0
-          row.elapsed = data.value.elapsed || 0
-          row.stroke_rate = data.value.stroke_rate || 0
-          row.heart_rate = data.value.heart_rate || 0
-          row.total_distance_m = data.total_distance_m || 0
-          row.avg_distance_cmps = data.avg_distance_cmps || 0
-          row.total_strokes = data.total_strokes || 0
-          chart_series.push(row)
-          linechart.update(chart_series) // send the new complete dataset to generate graph
+          row = [];
+          row.time = data.value.time || 0;
+          row.elapsed = data.value.elapsed || 0;
+          row.stroke_rate = data.value.stroke_rate || 0;
+          row.heart_rate = data.value.heart_rate || 0;
+          row.total_distance_m = data.total_distance_m || 0;
+          row.avg_distance_cmps = data.avg_distance_cmps || 0;
+          row.total_strokes = data.total_strokes || 0;
+          chart_series.push(row);
+          linechart.update(chart_series); // send the new complete dataset to generate graph
         }
     };
 
+    // update the polar chart, gathering data
     function updatePolarChart() {
-        var data = [];
-        var strokeRate = parseInt($('#stroke-rate').text());
-        data.push({name: 's/m',
-                   value: (!isNaN(strokeRate) && strokeRate > 0) ? strokeRate/MAX_STROKE_RATE : 0,
-                   index: 0.3});
+      var data = [];
+      var strokeRate = parseInt($('#stroke-rate').text());
+      data.push({name: 's/m',
+                 value: (!isNaN(strokeRate) && strokeRate > 0) ? strokeRate/MAX_STROKE_RATE : 0,
+                 index: 0.3});
+      if (workoutDistance > 0) {
+        console.log(workoutDistance)
+        var distance = parseInt($('#total-distance-m').text().replace(/^0+/, ''));
+        data.push({name: 'm',
+                  value: (!isNaN(distance) && distance > 0) ? distance / workoutDistance : 0,
+                  index: 0.1});
+      }
+      if (workoutDuration > 0) {
+        var elapsed = workoutDuration - (parseInt($('#clock #seconds').text())
+            + parseInt($('#clock #minutes').text()) * 60 + parseInt($('#clock #hours').text()) * 3600);
+        data.push({name: 's',
+                  value: elapsed / workoutDuration,
+                  index: 0.1});
+      }
+      var mps = parseFloat($("#avg-mps").text());
+      data.push({name: 'm/s',
+                  value: (!isNaN(mps) && mps > 0) ? mps/MAX_MPS : 0,
+                  index: 0.2});
+      polarchart.update(data);
+    }
 
-        if (workoutDistance > 0) {
-            var distance = parseInt($('#total-distance-m').text().replace(/^0+/, ''));
-            data.push({
-                name: 'm',
-                value: (!isNaN(distance) && distance > 0) ? distance / workoutDistance : 0,
-                index: 0.1
-            });
-        }
-
-        if (workoutDuration > 0) {
-            var elapsed = workoutDuration - (parseInt($('#clock #seconds').text())
-                + parseInt($('#clock #minutes').text()) * 60 + parseInt($('#clock #hours').text()) * 3600);
-            data.push({
-                name: 's',
-                value: elapsed / workoutDuration,
-                index: 0.1
-            });
-        }
-        var mps = parseFloat($("#avg-mps").text());
-        data.push({name: 'm/s',
-                    value: (!isNaN(mps) && mps > 0) ? mps/MAX_MPS : 0,
-                    index: 0.2});
-        polarchart.update(data);
+    function resetGraph() {
+        chart_series.length = 0;
+        polarchart.reset();
+        linechart.reset();
     }
 
     function pad(n, len) {
@@ -160,6 +161,18 @@ dashboard = (function($) {
         return parseInt(value);
     }
 
+    function setWTypeClass() {
+      var type = $('input[name="workout-type"]:checked').val();
+      if (type === "WSI") {
+        $('#distance-workout').addClass("w3-khaki")
+        $('#time-workout').removeClass("w3-khaki")
+      }
+      if (type === "WSU") {
+        $('#time-workout').addClass("w3-khaki")
+        $('#distance-workout').removeClass("w3-khaki")
+      }
+    }
+
     function init() {
         ws = new ReconnectingWebSocket('ws://' +document.location.host +'/ws');
         ws.onopen = onopen;
@@ -168,33 +181,59 @@ dashboard = (function($) {
         ws.onerror = onerror;
         timerId = setInterval(updatePolarChart, 100);
 
-        $('#workout-begin').click(function() {
-            var workoutTarget = $('#workout-target').val();
-            var type = $('#workout-type').val();
-            if (!isNaN(workoutTarget) && type) {
-                workoutTarget = parseInt(workoutTarget);
-                if (type === "WSU") {
-                    workoutTarget *= 60;
-                    workoutDuration = workoutTarget;
-                }
-                if (type === "WSI") {
-                    workoutDistance = workoutTarget;
-                }
-                polarchart.reset();
-                var msg = JSON.stringify({type: 'workout-begin',
-                    value: {
-                        type: type,
-                        target: workoutTarget
-                    }});
-                ws.send(msg);
-            }
-            return false;
+        setWTypeClass();
+        $('#time-workout').click(function() {
+          setWTypeClass();
+        });
+        $('#distance-workout').click(function() {
+          setWTypeClass();
         });
 
-        $('#workout-end').click(function() {
+        $('#workout-action').click(function() {
+          var workoutAction = $('#workout-action-value');
+          if ($(workoutAction).prop("checked")) {
+            // workout was running
+            // console.log("workout was running")
             var msg = JSON.stringify({type: 'workout-end'});
             ws.send(msg);
+            workoutAction.prop("checked", false);
+            $(this).toggleClass('w3-khaki');
+            $('#time-workout').removeClass("w3-disabled")
+            $('#distance-workout').removeClass("w3-disabled")
+            $("#workout-action-txt").text("Start");
             return false;
+          } else {
+            // workout was stopped
+            // console.log("workout was stopped")
+            var workoutTarget = $('#workout-target').val();
+            var type = $('input[name="workout-type"]:checked').val();
+            if (!isNaN(workoutTarget) && $.isNumeric(workoutTarget) && type) {
+              workoutTarget = parseInt(workoutTarget);
+              if (type === "WSU") {
+                workoutTarget *= 60;
+                workoutDuration = workoutTarget;
+              }
+              if (type === "WSI") {
+                workoutDistance = workoutTarget;
+              }
+              resetGraph();
+              var msg = JSON.stringify({type: 'workout-begin',
+                value: {
+                  type: type,
+                  target: workoutTarget
+                }});
+              ws.send(msg);
+              $(this).toggleClass('w3-khaki');
+              $('#time-workout').addClass("w3-disabled")
+              $('#distance-workout').addClass("w3-disabled")
+              $("#workout-action-txt").text("Stop");
+              workoutAction.prop("checked", true);
+              return true;
+            }
+            // console.log("could not start workout");
+            workoutAction.prop("checked", false);
+            return false;
+          }
         });
     }
 

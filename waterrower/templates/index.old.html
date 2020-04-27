@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="{{ static_url("reset.css") }}" />
+    <link rel="stylesheet" href="{{ static_url("base.css") }}" />
+  </head>
+  <style>
+
+  </style>
+  <body>
+    <div id="content">
+      <div id="status" class="not-connected">Not connected</div>
+      <div id="version">
+          <span id="model"></span>
+          <span id="tank_volume"></span>
+      </div>
+      <div id="workout-details">
+        <label for="workout-type">Workout:</label>
+        <select id="workout-type">
+            <option value="WSI">Distance (m)</option>
+            <option selected value="WSU">Time (mins)</option>
+        </select>
+        <label for="workout-target">Target:</label>
+        <input id="workout-target" type="number" />
+        <button id="workout-begin">Begin</button>
+        <button id="workout-end">End</button>
+      </div>
+      <div id="stats" style="display:flex">
+          <div style="display: flex;flex-direction: column;">
+          <div>
+              <dl class="stat stat-small">
+          <dt>total strokes</dt>
+          <dd id="total-strokes">0000</dd>
+        </dl>
+        <dl class="stat stat-small">
+          <dt>total kcal</dt>
+          <dd id="total-kcal">0000</dd>
+        </dl>
+          </div>
+          <div>
+              <dl class="stat stat-small"><dt>stroke rate</dt><dd id="stroke-rate">0</dd></dl>
+        <dl class="stat stat-small"><dt>m/s</dt><dd id="avg-mps">0.00</dd></dl>
+                      <dl class="stat stat-small">
+          <dt>heart rate</dt>
+          <dd id="heart_rate">00</dd>
+        </dl>
+
+        </div>
+        </div>
+        <dl class="stat stat-large">
+          <dt>total m</dt>
+          <dd><span id="total-distance-m">00000</span></dd>
+        </dl>
+        <dl class="stat stat-large" id="split"><dt>/500m</dt><dd id="avg-500m-min">00</dd>:<dd id="avg-500m-sec">00</dd></dl>
+        <dl class="stat stat-large" id="clock">
+          <dt>total time</dt>
+          <dd id="hours" style="display:none">00</dd><!--:--><dd id="minutes">00</dd>:<dd id="seconds">00</dd>.<dd id="millis">0</dd>
+        </dl>
+      </div>
+        <div style="display:flex; min-height: 50vh;">
+          <div id="polarchart" style="flex-grow: 1;"></div>
+          <div id="linechart" style="flex-grow: 3;"></div>
+        </div>
+        </div>
+    </div>
+    <script src="{{ static_url("jquery.min.js") }}"></script>
+    <script src="{{ static_url("d3.min.js") }}"></script>
+    <script src="{{ static_url("reconnecting-websocket.min.js") }}"></script>
+    <script src="{{ static_url("graph.js") }}"></script>
+    <script src="{{ static_url("dashboard.js") }}"></script>
+    <script>
+      $(function() {
+          polarchart.init();
+          linechart.init();
+          dashboard.init();
+      });
+    </script>
+  </body>
+</html>

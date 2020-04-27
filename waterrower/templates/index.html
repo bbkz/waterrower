@@ -1,66 +1,92 @@
+<!DOCTYPE html>
 <html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
   <head>
-    <link rel="stylesheet" href="{{ static_url("reset.css") }}" />
+    <link rel="stylesheet" href="{{ static_url("w3.css") }}" />
     <link rel="stylesheet" href="{{ static_url("base.css") }}" />
   </head>
-  <style>
-
-  </style>
   <body>
-    <div id="content">
-      <div id="status" class="not-connected">Not connected</div>
-      <div id="version">
-          <span id="model"></span>
-          <span id="tank_volume"></span>
-      </div>
-      <div id="workout-details">
-        <label for="workout-type">Workout:</label>
-        <select id="workout-type">
-            <option value="WSI">Distance (m)</option>
-            <option selected value="WSU">Time (mins)</option>
-        </select>
-        <label for="workout-target">Target:</label>
-        <input id="workout-target" type="number" />
-        <button id="workout-begin">Begin</button>
-        <button id="workout-end">End</button>
-      </div>
-      <div id="stats" style="display:flex">
-          <div style="display: flex;flex-direction: column;">
-          <div>
-              <dl class="stat stat-small">
-          <dt>total strokes</dt>
-          <dd id="total-strokes">0000</dd>
-        </dl>
-        <dl class="stat stat-small">
-          <dt>total kcal</dt>
-          <dd id="total-kcal">0000</dd>
-        </dl>
-          </div>
-          <div>
-              <dl class="stat stat-small"><dt>stroke rate</dt><dd id="stroke-rate">0</dd></dl>
-        <dl class="stat stat-small"><dt>m/s</dt><dd id="avg-mps">0.00</dd></dl>
-                      <dl class="stat stat-small">
-          <dt>heart rate</dt>
-          <dd id="heart_rate">00</dd>
-        </dl>
+    <div id="content" class="w3-container w3-dark-grey">
 
+      <div id="workout-control" class="w3-row">
+        <div id="settings" class="w3-threequarter">
+          <div id="workout-selector" class="w3-cell-row">
+            <label id="time-workout" class="w3-btn w3-blue-grey w3-round-large w3-cell" for="WSU">
+              <span id="time-workout-txt">Time (mins)</span>
+              <input id="WSU" value="WSU" class="w3-hide" type="radio" name="workout-type" checked>
+            </label>
+            <label id="distance-workout" class="w3-btn w3-blue-grey w3-round-large w3-cell" for="WSI">
+              <span id="distance-workout-txt">Distance (m)</span>
+              <input id="WSI" value="WSI" class="w3-hide" type="radio" name="workout-type">
+            </label>
+            <label class="w3-cell">
+              <input id="workout-target" class="w3-input w3-grey w3-border-0 w3-round" type="number"/>
+            </label>
+          </div>
         </div>
+        <div class="w3-quarter">
+          <div id="action" class="w3-twothird">
+            <div class="w3-cell-row">
+              <label id="workout-action" class="w3-btn w3-blue-grey w3-round-large w3-cell w3-half" for="workout-action">
+                <span id="workout-action-txt">Start</span>
+                <input id="workout-action-value" class="w3-hide" type="checkbox"/>
+              </label>
+            </div>
+          </div>
+          <div id="info" class="w3-third">
+            <div id="status" class="not-connected w3-text">Not connected</div>
+            <div id="version">
+                <span id="model"></span>
+                <span id="tank_volume"></span>
+            </div>
+          </div>
         </div>
-        <dl class="stat stat-large">
-          <dt>total m</dt>
-          <dd><span id="total-distance-m">00000</span></dd>
-        </dl>
-        <dl class="stat stat-large" id="split"><dt>/500m</dt><dd id="avg-500m-min">00</dd>:<dd id="avg-500m-sec">00</dd></dl>
-        <dl class="stat stat-large" id="clock">
-          <dt>total time</dt>
-          <dd id="hours" style="display:none">00</dd><!--:--><dd id="minutes">00</dd>:<dd id="seconds">00</dd>.<dd id="millis">0</dd>
-        </dl>
       </div>
-        <div style="display:flex">
-        <div id="viz"></div>
-        <div id="chart" style="flex-grow: 1;"></div>
+
+      <div id="stats" class="w3-row">
+        <div class="stat-small w3-third">
+          <div class="w3-cell-row">
+            <div class="w3-cell">
+              <dl>
+                <dt>stroke rate</dt><dd id="stroke-rate">0</dd>
+                <dt>heart rate</dt><dd id="heart_rate">00</dd>
+                <dt>m/s</dt><dd id="avg-mps">0.00</dd>
+              </dl>
+            </div>
+            <div class="w3-cell">
+              <dl>
+                <dt>total strokes</dt><dd id="total-strokes">0000</dd>
+                <dt>total kcal</dt><dd id="total-kcal">0000</dd>
+              </dl>
+            </div>
+          </div>
         </div>
+        <div class="stat-large w3-twothird">
+          <div class="heading w3-cell-row">
+            <div class="w3-cell w3-center">total m</div>
+            <div class="w3-cell w3-center">/500m</div>
+            <div class="w3-cell w3-center">total time</div>
+          </div>
+          <div class="value w3-cell-row">
+            <div class="w3-cell w3-center"><span id="total-distance-m">00000</span></div>
+            <div class="w3-cell w3-center">
+              <span id="avg-500m-min">00</span>:<span id="avg-500m-sec">00</span>
+            </div>
+            <div id="clock" class="w3-cell w3-center">
+              <span id="hours" style="display:none">00</span><!--:-->
+              <span id="minutes">00</span>:<span id="seconds">00</span>.<span id="millis">0</span>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div id="graph" class="w3-row">
+        <div class="w3-cell-row" style="display:flex; min-height: 50vh;">
+          <div id="polarchart" class="w3-cell w3-quarter"></div>
+          <div id="linechart" class="w3-cell w3-threequarter"></div>
+        </div>
+      </div>
+
     </div>
     <script src="{{ static_url("jquery.min.js") }}"></script>
     <script src="{{ static_url("d3.min.js") }}"></script>

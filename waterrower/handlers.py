@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import tornado
 import logging
 import json
