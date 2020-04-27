@@ -61,7 +61,7 @@ dashboard = (function($) {
             $('#heart_rate').text(data.value);
         },
         reset: function(data){
-            resetGraph();
+            resetWorkout();
         },
         'workout-start': function(data){ //??
 
@@ -92,7 +92,6 @@ dashboard = (function($) {
                  value: (!isNaN(strokeRate) && strokeRate > 0) ? strokeRate/MAX_STROKE_RATE : 0,
                  index: 0.3});
       if (workoutDistance > 0) {
-        console.log(workoutDistance)
         var distance = parseInt($('#total-distance-m').text().replace(/^0+/, ''));
         data.push({name: 'm',
                   value: (!isNaN(distance) && distance > 0) ? distance / workoutDistance : 0,
@@ -112,8 +111,10 @@ dashboard = (function($) {
       polarchart.update(data);
     }
 
-    function resetGraph() {
+    function resetWorkout() {
         chart_series.length = 0;
+        workoutDuration = 0;
+        workoutDistance = 0;
         polarchart.reset();
         linechart.reset();
     }
@@ -164,12 +165,12 @@ dashboard = (function($) {
     function setWTypeClass() {
       var type = $('input[name="workout-type"]:checked').val();
       if (type === "WSI") {
-        $('#distance-workout').addClass("w3-khaki")
-        $('#time-workout').removeClass("w3-khaki")
+        $('#distance-workout').addClass("w3-camo-green")
+        $('#time-workout').removeClass("w3-camo-green")
       }
       if (type === "WSU") {
-        $('#time-workout').addClass("w3-khaki")
-        $('#distance-workout').removeClass("w3-khaki")
+        $('#time-workout').addClass("w3-camo-green")
+        $('#distance-workout').removeClass("w3-camo-green")
       }
     }
 
@@ -190,6 +191,7 @@ dashboard = (function($) {
         });
 
         $('#workout-action').click(function() {
+          resetWorkout();
           var workoutAction = $('#workout-action-value');
           if ($(workoutAction).prop("checked")) {
             // workout was running
@@ -197,7 +199,7 @@ dashboard = (function($) {
             var msg = JSON.stringify({type: 'workout-end'});
             ws.send(msg);
             workoutAction.prop("checked", false);
-            $(this).toggleClass('w3-khaki');
+            $(this).toggleClass('w3-camo-green');
             $('#time-workout').removeClass("w3-disabled")
             $('#distance-workout').removeClass("w3-disabled")
             $("#workout-action-txt").text("Start");
@@ -216,14 +218,13 @@ dashboard = (function($) {
               if (type === "WSI") {
                 workoutDistance = workoutTarget;
               }
-              resetGraph();
               var msg = JSON.stringify({type: 'workout-begin',
                 value: {
                   type: type,
                   target: workoutTarget
                 }});
               ws.send(msg);
-              $(this).toggleClass('w3-khaki');
+              $(this).toggleClass('w3-camo-green');
               $('#time-workout').addClass("w3-disabled")
               $('#distance-workout').addClass("w3-disabled")
               $("#workout-action-txt").text("Stop");
