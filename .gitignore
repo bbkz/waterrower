@@ -1,4 +1,5 @@
 waterrower-dev.cfg
+waterrower-prod.cfg
 data/*.json
 
 #################
