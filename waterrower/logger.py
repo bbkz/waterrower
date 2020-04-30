@@ -35,6 +35,7 @@ class DataLogger(object):
             self.start_activity()
 
         if event['type'] == 'reset':
+            logging.debug("[*] logger.py: on_rower_event() -> reset event called")
             self.end_activity()
 
         if event['type'] == 'exit':
