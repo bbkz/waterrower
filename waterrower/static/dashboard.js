@@ -112,31 +112,29 @@ dashboard = (function($) {
     }
 
     function resetWorkout() {
-        chart_series.length = 0;
-        workoutDuration = 0;
-        workoutDistance = 0;
-        polarchart.reset();
-        linechart.reset();
+      chart_series.length = 0;
+      polarchart.reset();
+      linechart.reset();
     }
 
     function pad(n, len) {
-        var result = String(n);
-        while (result.length < len) {
-            result = "0" + result;
-        }
-        return result;
+      var result = String(n);
+      while (result.length < len) {
+        result = "0" + result;
+      }
+      return result;
     }
 
     function onopen(e) {
-        $('#status')
-            .attr('class', 'connected')
-            .text('Connected');
+      $('#status')
+        .attr('class', 'connected')
+        .text('Connected');
     }
 
     function onclose(e) {
-        $('#status')
-            .attr('class', 'not-connected')
-            .text('Not connected');
+      $('#status')
+        .attr('class', 'not-connected')
+        .text('Not connected');
     }
 
     function onmessage(e) {
@@ -191,11 +189,13 @@ dashboard = (function($) {
         });
 
         $('#workout-action').click(function() {
-          resetWorkout();
+          // reset values before setting it here
+          workoutDuration = 0;
+          workoutDistance = 0;
           var workoutAction = $('#workout-action-value');
           if ($(workoutAction).prop("checked")) {
-            // workout was running
-            // console.log("workout was running")
+            // workout was running, stopping it
+            // console.log("workout was running, stopping it...")
             var msg = JSON.stringify({type: 'workout-end'});
             ws.send(msg);
             workoutAction.prop("checked", false);
@@ -205,8 +205,8 @@ dashboard = (function($) {
             $("#workout-action-txt").text("Start");
             return false;
           } else {
-            // workout was stopped
-            // console.log("workout was stopped")
+            // workout was stopped, starting it
+            // console.log("workout was stopped, starting it...")
             var workoutTarget = $('#workout-target').val();
             var type = $('input[name="workout-type"]:checked').val();
             if (!isNaN(workoutTarget) && $.isNumeric(workoutTarget) && type) {
