@@ -207,9 +207,10 @@ var linechart = (function() {
     // filter array data to kind of zoom in
     data = data.filter(function(item, idx) {
       // timestamp js uses ms - elapsed range in ms 60000 ms = 1 min
-      range = Date.now() - 60000;
+      // range = Date.now() - 60000;
       // return item.time >= range && item.stroke_rate != 0 && item.heart_rate != 0;
-      return item.time >= range && item.stroke_rate != 0;
+      // return item.time >= range && item.stroke_rate != 0;
+      return  item.stroke_rate != 0;
     });
     renderLineChart(linesvg, data)
   }
