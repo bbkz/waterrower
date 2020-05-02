@@ -1,43 +1,44 @@
 body {
-    font-family: Inconsolata, monospace;
+  font-family: Inconsolata, monospace;
 }
 
 #content {
-    font-size: 1.2vw;
+  font-size: 1.2vw;
 }
 #info {
   font-size: 1vw;
 }
 
 .stat-small dt {
-    font-size: 1.5vw;
+  font-size: 1.5vw;
 }
 .stat-small dd {
-    font-size: 2.5vw;
+  font-size: 2.5vw;
 }
 .stat-large .heading {
-    font-size: 2vw;
+  font-size: 2vw;
 }
 .stat-large .value {
-    font-size: 5vw;
+  font-size: 5vw;
 }
 
 #status.not-connected {
-    color: #fc0;
+  color: #fc0;
 }
 
 #status.connected {
-    color: #0c0;
+  color: #0c0;
 }
 
 #status.error {
-    color: #c00;
+  color: #c00;
 }
 
 #polarchart {
-    text-align: center;
+  text-align: center;
 }
 
 #polarchart text {
-    fill: white;
+  font-size: 0.9vw;
+  fill: #ffc107;
 }
