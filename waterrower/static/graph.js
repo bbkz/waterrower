@@ -197,10 +197,10 @@ var linechart = (function() {
       .attr("stroke-linecap", "round");
     lineG.append("path")
       .attr("class", "linepath1")
-      .attr("stroke", "steelblue")
+      .attr("stroke", "#1c9750")
     lineG.append("path")
       .attr("class", "linepath2")
-      .attr("stroke", "orange")
+      .attr("stroke", "#63613e")
   }
 
   var update = function(data) {
