@@ -210,7 +210,7 @@ var linechart = (function() {
       // range = Date.now() - 60000;
       // return item.time >= range && item.stroke_rate != 0 && item.heart_rate != 0;
       // return item.time >= range && item.stroke_rate != 0;
-      return  item.stroke_rate != 0;
+      return !isNaN(item.stroke_rate) && item.stroke_rate != 0;
     });
     renderLineChart(linesvg, data)
   }
