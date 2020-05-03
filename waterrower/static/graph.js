@@ -1,12 +1,7 @@
-var polarchart = (function() {
-  var polarsvg = null;
-  var h = parseInt(d3.select("#polarchart").style('height'), 10);
-  var w = parseInt(d3.select("#polarchart").style('width'), 10);
-  var startingData = [{name: 'm', index: 0.1, value: 0},
-                      {name: 'm/s', index: 0.2, value: 0},
-                      {name: 's/m', index: 0.3, value: 0}];
+// add global namespace for polar chart functions
+var polarchart = {
 
-  var renderPolarChart = function(selection, arrData) {
+  renderPolarChart: function(selection, arrData) {
     var r = Math.min(w, h) / 1;
     var s = 0.09;
 
@@ -55,9 +50,15 @@ var polarchart = (function() {
         + "translate(0," + -(arcIndex(d) + s / 2) * r + ")"
         + "rotate(" + (arcValue(d) < .5 ? -90 : 90) + ")")
       .text(d => arcName(d));
-  }
+  },
 
-  var init = function() {
+  init: function() {
+    h = parseInt(d3.select("#polarchart").style('height'), 10);
+    w = parseInt(d3.select("#polarchart").style('width'), 10);
+    startingData = [{name: 'm', index: 0.1, value: 0},
+                        {name: 'm/s', index: 0.2, value: 0},
+                        {name: 's/m', index: 0.3, value: 0}];
+
     polarsvg = d3.select("#polarchart").append("svg")
       .attr("width", "100%")
       .attr("height", "100%")
@@ -79,33 +80,22 @@ var polarchart = (function() {
     pallG.append("text")
       .attr("text-anchor", "middle")
       .attr("dy", "1em")
+  },
 
-    update(startingData);
-  }
+  update: function(data) {
+    polarchart.renderPolarChart(polarsvg, data)
+  },
 
-  var update = function(data) {
-    renderPolarChart(polarsvg, data)
-  }
+  reset: function() {
+    polarchart.update(startingData);
+  },
 
-  var reset = function() {
-    update(startingData);
-  }
+}; // polarchart
 
-  return {
-    init: init,
-    update: update,
-    reset: reset
-  }
+// add global namespace for line chart functions
+var linechart = {
 
-})();
-
-var linechart = (function() {
-  var linesvg = null
-  var startingData = [
-    {stroke_rate: 0, heart_rate: 0, total_distance_m: 0, total_strokes: 0, avg_distance_cmps: 0, time: 0, elapsed: 0}
-  ];
-
-  var renderLineChart = function(selection, arrData) {
+  renderLineChart: function(selection, arrData) {
     margin = ({top: 20, right: 30, bottom: 20, left: 30})
     h = parseInt(selection.style('height'), 10);
     w = parseInt(selection.style('width'), 10);
@@ -176,9 +166,9 @@ var linechart = (function() {
     // line handle removed data
     line1.exit().remove();
     line2.exit().remove();
-  }
+  },
 
-  var init = function() {
+  init: function() {
     // create containers
     linesvg = d3.select('#linechart').append("svg")
       .attr("height", "100%")
@@ -201,9 +191,9 @@ var linechart = (function() {
     lineG.append("path")
       .attr("class", "linepath2")
       .attr("stroke", "#63613e")
-  }
+  },
 
-  var update = function(data) {
+  update: function(data) {
     // filter array data to kind of zoom in
     data = data.filter(function(item, idx) {
       // timestamp js uses ms - elapsed range in ms 60000 ms = 1 min
@@ -212,17 +202,14 @@ var linechart = (function() {
       // return item.time >= range && item.stroke_rate != 0;
       return !isNaN(item.stroke_rate) && item.stroke_rate != 0;
     });
-    renderLineChart(linesvg, data)
-  }
+    linechart.renderLineChart(linesvg, data)
+  },
 
-  var reset = function() {
-    update(startingData);
-  }
+  reset: function() {
+    var startingData = [
+      {stroke_rate: 0, heart_rate: 0, total_distance_m: 0, total_strokes: 0, avg_distance_cmps: 0, time: 0, elapsed: 0}
+    ];
+    linechart.update(startingData);
+  },
 
-  return {
-    init: init,
-    update: update,
-    reset: reset
-  }
-
-})();
+}; // linechart
