@@ -1,6 +1,8 @@
 waterrower-dev.cfg
 waterrower-prod.cfg
 data/*.json
+json/*.json
+waterrower/static/json/*.json
 
 #################
 ## IDEA

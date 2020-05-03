@@ -6,8 +6,8 @@
     <link rel="stylesheet" href="{{ static_url("w3-colors-camo.css") }}" />
     <link rel="stylesheet" href="{{ static_url("base.css") }}" />
   </head>
-  <body>
-    <div id="content" class="w3-container w3-camo-black w3-text-amber">
+  <body class="w3-camo-black w3-text-amber">
+    <div id="content" class="w3-container">
 
       <div id="workout-control" class="w3-row">
         <div id="settings" class="w3-threequarter">
@@ -82,7 +82,7 @@
       </div>
 
       <div id="graph" class="w3-row">
-        <div class="w3-cell-row" style="display:flex; min-height: 50vh;">
+        <div id="graphrow" class="w3-cell-row">
           <div id="polarchart" class="w3-cell w3-quarter"></div>
           <div id="linechart" class="w3-cell w3-threequarter"></div>
         </div>

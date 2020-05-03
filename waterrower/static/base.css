@@ -34,6 +34,11 @@ body {
   color: #c00;
 }
 
+#graphrow {
+  display:flex;
+  min-height: 50vh;
+}
+
 #polarchart {
   text-align: center;
 }
@@ -41,4 +46,8 @@ body {
 #polarchart text {
   font-size: 0.9vw;
   fill: #ffc107;
+}
+
+#linechart {
+  width: 100%;
 }

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <link rel="stylesheet" href="{{ static_url("w3.css") }}" />
+    <link rel="stylesheet" href="{{ static_url("w3-colors-camo.css") }}" />
+    <link rel="stylesheet" href="{{ static_url("base.css") }}" />
+  </head>
+  <body class="w3-camo-black w3-text-amber">
+    <div id="content" class="w3-container">
+
+      <div id="workout-selector" class="w3-row">
+        <select id="workout-select" class="w3-select w3-text-yellow w3-camo-light-green w3-round-large w3-cell w3-border-0"></select>
+      </div>
+
+      <div id="stats" class="w3-row">
+        <div class="stat-small w3-third">
+          <div class="w3-cell-row">
+            <div class="w3-cell">
+              <dl>
+                <dt>total strokes</dt><dd id="total-strokes">0000</dd>
+                <dt>total kcal</dt><dd id="total-kcal">0000</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+        <div class="stat-large w3-twothird">
+          <div class="heading w3-cell-row">
+            <div class="w3-cell w3-center">total m</div>
+            <div class="w3-cell w3-center">/500m</div>
+            <div class="w3-cell w3-center">total time</div>
+          </div>
+          <div class="value w3-cell-row">
+            <div class="w3-cell w3-center"><span id="total-distance-m">00000</span></div>
+            <div class="w3-cell w3-center">
+              <span id="avg-500m-min">00</span>:<span id="avg-500m-sec">00</span>
+            </div>
+            <div id="clock" class="w3-cell w3-center">
+              <span id="hours" style="display:none">00</span><!--:-->
+              <span id="minutes">00</span>:<span id="seconds">00</span>.<span id="millis">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="graphrow" class="w3-cell-row">
+        <div id="linechart" class="w3-cell"></div>
+      </div>
+
+    </div>
+    <script src="{{ static_url("jquery.min.js") }}"></script>
+    <script src="{{ static_url("d3.min.js") }}"></script>
+    <script src="{{ static_url("graph.js") }}"></script>
+    <script src="{{ static_url("archive.js") }}"></script>
+    <script>
+      $(function() {
+        linechart.init();
+        archive.init();
+      });
+    </script>
+  </body>
+</html>
