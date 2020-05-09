@@ -1,3 +1,4 @@
+- fullscreen browser breaks polarchart layout
 - allow starting webinterface without serial connection (for archive viewing) -> create event / state?
 - overwrite workouts.json in nextcloud upload
 - when starting workout from s4 -> get the data/settings
