@@ -10,6 +10,7 @@ initial base is a fork from https://github.com/gar3thjon3s/rower and is inspired
 * record workout details and overview
 * show realtime graph and statistics
 * view the archive of the workouts
+* upload workouts to nextcloud or google fit
 
 ![Workout](/docs/screenshot1.png?raw=true "Workout View")
 
@@ -17,13 +18,13 @@ initial base is a fork from https://github.com/gar3thjon3s/rower and is inspired
 
 ## Requirement
 
-It uses python3 the python libraries needed to run are stated in the requirements.txt file. But here are some packages that i installed on raspbian 10 "buster":
+It uses python3, the python libraries needed to run are stated in the requirements.txt file. But here are some packages that i installed on raspbian 10 "buster":
 
 ```
 sudo apt install python3-pip python3-serial python3-oauth2client
 ```
 
-For uploading to nextcloud:
+For additional and higher versions the following pip packages needs to be installed:
 
 ```
 sudo pip3 install tornado pyocclient google-api-python-client
@@ -40,9 +41,4 @@ There are two bash scripts that can be used to test and develop:
 
 ### interface.py
 
-is caring about the connection to the s4 - sensor hardware -> @todo make it plugable for other sensors
-
-## Todo
-
-- visualization; fix correlation between heart rate value and stroke rate value, in terms of numbers
-- if there is none, do we split the graph in two or does it make sense to overlap them?
+is all about the connection to the s4 - sensor hardware
