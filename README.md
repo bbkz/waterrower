@@ -5,7 +5,15 @@ A web ui for the s4 monitor on waterrower rowing machine
 This is a fork of https://github.com/bfritscher/waterrower, where is stated that it's
 initial base is a fork from https://github.com/gar3thjon3s/rower and is inspired by https://github.com/olympum/oarsman/blob/master/s4/s4.go and the Water Rower S4 & S5 USB Protocol document.
 
+## Features
 
+* record workout details and overview
+* show realtime graph and statistics
+* view the archive of the workouts
+
+![Workout](/docs/screenshot1.png?raw=true "Workout View")
+
+# Installation / Configuration
 
 ## Requirement
 
