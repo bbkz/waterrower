@@ -1,5 +1,11 @@
+- fullscreen browser breaks polarchart layout
+- allow starting webinterface without serial connection (for archive viewing) -> create event / state?
+- overwrite workouts.json in nextcloud upload
+- when starting workout from s4 -> get the data/settings
 - exit button
-- less command line
-- better layout
-- font graph
-- disable fit upload in demo mode?
+- less command line -> start as service with webinterface -> requires running without serial con
+- better layout -> wip
+- font graph -> wip
+- disable fit upload in demo mode? -> demo can have different config file
+- migrate google fit into storage.py alongside with the nextcloud uploader -> need google fit (maybe with anbox - https://www.linuxuprising.com/2018/07/anbox-how-to-install-google-play-store.html ?)
+- test running the server with a user that has serial dev permissions (dialout group)
