@@ -35,7 +35,7 @@ body {
 }
 
 #graphrow {
-  display:flex;
+  display: flex;
   min-height: 50vh;
 }
 
@@ -50,4 +50,8 @@ body {
 
 #linechart {
   width: 100%;
+}
+
+.vjs-playlist .vjs-playlist-duration {
+  display: none;
 }

@@ -14,6 +14,7 @@ import datetime
 import argparse
 import configparser
 from logger import DataLogger
+import tvhhandler
 
 ## Set up the command-line options (parameters)
 parser = argparse.ArgumentParser(description='Waterrower S4')
@@ -76,6 +77,8 @@ class Application(tornado.web.Application):
             (r"/ws", handlers.DashboardWebsocketHandler, dict(rower_interface=rower_interface)),
             (r"/(.*.html)", handlers.TemplateHandler),
             (r"/", handlers.TemplateHandler),
+            (r"/tv", tvhhandler.PlayerHandler, dict(config=config)),
+            (r"/tv/playlist", tvhhandler.PlaylistHandler, dict(config=config)),
             ]
         settings = {
             'template_path': os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"),

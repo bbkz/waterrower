@@ -1,0 +1,55 @@
+{% autoescape None %}
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <link rel="stylesheet" href="{{ static_url("video-js.min.css") }}" />
+    <link rel="stylesheet" href="{{ static_url("videojs-playlist-ui.css") }}" />
+    <link rel="stylesheet" href="{{ static_url("w3.css") }}" />
+    <link rel="stylesheet" href="{{ static_url("w3-colors-camo.css") }}" />
+    <link rel="stylesheet" href="{{ static_url("base.css") }}" />
+  </head>
+  <body class="w3-camo-black w3-text-amber">
+    <div id="content" class="w3-container">
+      <div class="vjs-playlist-player-container" style="max-width: 75%;">
+        <video-js
+          id="livetv"
+          class="video-js vjs-fluid"
+          data-setup='{
+            "controls": true,
+            "autoplay": false,
+            "preload": "auto",
+            "liveui": true,
+            "liveTracker": false
+          }'>
+  				<p class="vjs-no-js">
+  					To view this video please enable JavaScript, and consider upgrading to a web browser that supports HTML5 video
+  				</p>
+    		</video-js>
+        <div class="vjs-playlist"></div>
+      </div>
+    </div>
+    <script src="{{ static_url("jquery.min.js") }}"></script>
+    <script src="{{ static_url("video.min.js") }}"></script>
+    <script src="{{ static_url("videojs-playlist.min.js") }}"></script>
+    <script src="{{ static_url("videojs-playlist-ui.min.js") }}"></script>
+    <script>
+      function getPlaylist() {
+        $.getJSON( "tv/playlist", function( playlist ) {
+          player.playlist(playlist, -1);
+        });
+      };
+
+      var player = videojs('livetv');
+      player.playlistUi({
+        "playOnSelect": true,
+        "horizontal": true
+      });
+
+      // tvheadend ticket lifetime is 5 minutes
+      getPlaylist()
+      setInterval(getPlaylist, 240000);
+
+    </script>
+  </body>
+</html>
