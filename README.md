@@ -5,6 +5,9 @@ A web ui for the s4 monitor on waterrower rowing machine
 This is a fork of https://github.com/bfritscher/waterrower, where is stated that it's
 initial base is a fork from https://github.com/gar3thjon3s/rower and is inspired by https://github.com/olympum/oarsman/blob/master/s4/s4.go and the Water Rower S4 & S5 USB Protocol document.
 
+* http://[your host]:8000
+* http://[your host]:8000/archive.html
+
 ## Features
 
 * record workout details and overview
@@ -42,3 +45,8 @@ There are two bash scripts that can be used to test and develop:
 ### interface.py
 
 is all about the connection to the s4 - sensor hardware
+
+### data
+
+* all workout data is saved in json files
+* a data folder inside `waterrower/static/` is required for the archive viewer, to access the data

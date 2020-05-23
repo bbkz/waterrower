@@ -14,30 +14,31 @@
       </div>
 
       <div id="stats" class="w3-row">
+        <div class="stat-large w3-twothird">
+          <div class="heading w3-cell-row">
+            <div class="w3-cell w3-center">
+              total time
+              <div class="value" id="clock">
+                <span id="hours" style="display:none">00</span><!--:-->
+                <span id="minutes">00</span>:<span id="seconds">00</span>.<span id="millis">000</span>
+              </div>
+            </div>
+            <div class="w3-cell w3-center">
+              total m
+              <span class="value" id="total-distance-m">00000</span>
+            </div>
+            <div class="w3-cell w3-center">
+              total strokes
+              <span class="value" id="total-strokes">00</span>
+            </div>
+          </div>
+        </div>
         <div class="stat-small w3-third">
           <div class="w3-cell-row">
             <div class="w3-cell">
               <dl>
-                <dt>total strokes</dt><dd id="total-strokes">0000</dd>
                 <dt>total kcal</dt><dd id="total-kcal">0000</dd>
               </dl>
-            </div>
-          </div>
-        </div>
-        <div class="stat-large w3-twothird">
-          <div class="heading w3-cell-row">
-            <div class="w3-cell w3-center">total m</div>
-            <div class="w3-cell w3-center">/500m</div>
-            <div class="w3-cell w3-center">total time</div>
-          </div>
-          <div class="value w3-cell-row">
-            <div class="w3-cell w3-center"><span id="total-distance-m">00000</span></div>
-            <div class="w3-cell w3-center">
-              <span id="avg-500m-min">00</span>:<span id="avg-500m-sec">00</span>
-            </div>
-            <div id="clock" class="w3-cell w3-center">
-              <span id="hours" style="display:none">00</span><!--:-->
-              <span id="minutes">00</span>:<span id="seconds">00</span>.<span id="millis">0</span>
             </div>
           </div>
         </div>
