@@ -33,7 +33,7 @@ MEMORY_MAP = {'055': {'type': 'total_distance_m', 'size': 'double', 'base': 16},
 # REQUEST sent from PC to device
 # RESPONSE sent from device to PC
 
-USB_REQUEST = "USB"                # Application starting communication’s
+USB_REQUEST = "USB"                # Application starting communication's
 WR_RESPONSE = "_WR_"               # Hardware Type, Accept USB start sending packets
 EXIT_REQUEST = "EXIT"              # Application is exiting, stop sending packets
 OK_RESPONSE = "OK"                 # Packet Accepted
@@ -125,7 +125,7 @@ def find_port():
         if "WR" in name:
             logging.info("[*] interface.py: find_port() ->  serial port found: %s" % path)
             return path
-    logging.info("[*] interface.py: find_port() ->  serial port not found")
+    logging.debug("[*] interface.py: find_port() ->  serial port not found")
     return None
 
 
