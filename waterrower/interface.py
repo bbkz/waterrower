@@ -232,6 +232,7 @@ class Rower(object):
                         logging.error('[-] interface.py: _find_serial() -> serial open error waiting...', exc_info=1)
                         time.sleep(5)
                         self._serial.close()
+                time.sleep(5)
             else:
                 self._stop_event.wait(0.1)
 
