@@ -36,12 +36,8 @@ def parse_m3u(data):
     return playlist
 
 class PlayerHandler(tornado.web.RequestHandler):
-    def initialize(self, config):
-        self.playlist = get_playlist(config)
-
     def get(self):
-        if self.playlist:
-            self.render("player.html", title="TV Player", playlist=self.playlist)
+        self.render("player.html", title="TV Player")
 
 class PlaylistHandler(tornado.web.RequestHandler):
     def initialize(self, config):

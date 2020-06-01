@@ -77,7 +77,7 @@ class Application(tornado.web.Application):
             (r"/ws", handlers.DashboardWebsocketHandler, dict(rower_interface=rower_interface)),
             (r"/(.*.html)", handlers.TemplateHandler),
             (r"/", handlers.TemplateHandler),
-            (r"/tv", tvhhandler.PlayerHandler, dict(config=config)),
+            (r"/tv", tvhhandler.PlayerHandler),
             (r"/tv/playlist", tvhhandler.PlaylistHandler, dict(config=config)),
             ]
         settings = {
