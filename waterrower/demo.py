@@ -24,6 +24,7 @@ class FakeS4(object):
         self.__stop_event = None
         self.__workout_type = None
         self.__workout_target = None
+        self.port = True
 
     def __publish(self, s):
         self.__queue.put((s.upper() + '\r\n').encode('utf-8'))

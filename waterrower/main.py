@@ -98,11 +98,9 @@ def build_cleanup(rower_interface):
 
 def main():
     rower_interface = interface.Rower(options)
-    #TODO allow to load history of logger?
     DataLogger(rower_interface, config)
     cleanup = build_cleanup(rower_interface)
     signal.signal(signal.SIGINT, cleanup)
-    rower_interface.open()
     http_server = tornado.httpserver.HTTPServer(Application(rower_interface))
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()

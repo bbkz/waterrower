@@ -107,16 +107,16 @@ SIZE_PARSE_MAP = {'single': lambda cmd: cmd[6:8],
                   'triple': lambda cmd: cmd[6:12]}
 
 
-def ask_for_port():
-    print("Choose a serial port to use:")
-    ports = serial.tools.list_ports.comports()
-    for (i, (path, name, _)) in enumerate(ports):
-        print("%s. %s - %s" % (i, path, name))
-        if "WR" in name:
-            logging.info("[*] auto-chosen: %s" % path)
-            return path
-    result = input()
-    return ports[int(result)][0]
+# def ask_for_port():
+#     print("Choose a serial port to use:")
+#     ports = serial.tools.list_ports.comports()
+#     for (i, (path, name, _)) in enumerate(ports):
+#         print("%s. %s - %s" % (i, path, name))
+#         if "WR" in name:
+#             logging.info("[*] auto-chosen: %s" % path)
+#             return path
+#     result = input()
+#     return ports[int(result)][0]
 
 
 def find_port():
@@ -125,10 +125,8 @@ def find_port():
         if "WR" in name:
             logging.info("[*] interface.py: find_port() ->  serial port found: %s" % path)
             return path
-
-    logging.info("[*] interface.py: find_port() ->  serial port not found retrying in 5s")
-    time.sleep(5)
-    return find_port()
+    logging.info("[*] interface.py: find_port() ->  serial port not found")
+    return False
 
 
 def build_daemon(target):
@@ -206,8 +204,10 @@ class Rower(object):
             self._serial = serial.Serial()
             self._serial.baudrate = 19200
 
+        self._find_serial_thread = build_daemon(target=self._find_serial)
         self._request_thread = build_daemon(target=self.start_requesting)
         self._capture_thread = build_daemon(target=self.start_capturing)
+        self._find_serial_thread.start()
         self._request_thread.start()
         self._capture_thread.start()
 
@@ -216,30 +216,38 @@ class Rower(object):
             is_live_thread(self._capture_thread)
 
     def _find_serial(self):
-        if not self._demo:
-            self._serial.port = find_port()
-        try:
-            logging.debug("[*] interface.py: _find_serial() -> " + str(self._serial))
-            self._serial.open()
-            logging.info("[*] interface.py: _find_serial() -> serial open")
-        except serial.SerialException as e:
-            logging.error('[-] interface.py: _find_serial() -> serial open error waiting...', exc_info=1)
-            time.sleep(5)
-            self._serial.close()
-            self._find_serial()
+        asyncio.set_event_loop(asyncio.new_event_loop())
+        while not self._stop_event.is_set():
+            if not self._serial.isOpen():
+                if not self._demo:
+                    self._serial.port = find_port()
+                if self._serial.port:
+                    try:
+                        logging.debug("[*] interface.py: _find_serial() -> " + str(self._serial))
+                        self._serial.open()
+                        logging.info("[*] interface.py: _find_serial() -> serial open")
+                        self.write(USB_REQUEST)
+                        logging.info("[*] interface.py: _find_serial() -> USB Request sent to serial")
+                    except serial.SerialException as e:
+                        logging.error('[-] interface.py: _find_serial() -> serial open error waiting...', exc_info=1)
+                        time.sleep(5)
+                        self._serial.close()
+            else:
+                self._stop_event.wait(0.1)
 
-    def open(self):
-        if self._serial and self._serial.isOpen():
-            self._serial.close()
-        self._find_serial()
-        if self._stop_event.is_set():
-            logging.info("[*] interface.py: open() ->  reset threads")
-            self._stop_event.clear()
-            self._request_thread = build_daemon(target=self.start_requesting)
-            self._capture_thread = build_daemon(target=self.start_capturing)
-            self._request_thread.start()
-            self._capture_thread.start()
-        self.write(USB_REQUEST)
+    # def open(self):
+    #     if self._serial and self._serial.isOpen():
+    #         self._serial.close()
+    #
+    #     if self._stop_event.is_set():
+    #         logging.info("[*] interface.py: open() ->  reset threads")
+    #         self._stop_event.clear()
+    #         self._find_serial_thread = build_daemon(target=self._find_serial)
+    #         self._request_thread = build_daemon(target=self.start_requesting)
+    #         self._capture_thread = build_daemon(target=self.start_capturing)
+    #         self._find_serial_thread.start()
+    #         self._request_thread.start()
+    #         self._capture_thread.start()
 
     def close(self):
         self.notify_callbacks(build_event("exit"))
