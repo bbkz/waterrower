@@ -126,7 +126,7 @@ def find_port():
             logging.info("[*] interface.py: find_port() ->  serial port found: %s" % path)
             return path
     logging.info("[*] interface.py: find_port() ->  serial port not found")
-    return False
+    return None
 
 
 def build_daemon(target):
@@ -235,19 +235,19 @@ class Rower(object):
             else:
                 self._stop_event.wait(0.1)
 
-    # def open(self):
-    #     if self._serial and self._serial.isOpen():
-    #         self._serial.close()
-    #
-    #     if self._stop_event.is_set():
-    #         logging.info("[*] interface.py: open() ->  reset threads")
-    #         self._stop_event.clear()
-    #         self._find_serial_thread = build_daemon(target=self._find_serial)
-    #         self._request_thread = build_daemon(target=self.start_requesting)
-    #         self._capture_thread = build_daemon(target=self.start_capturing)
-    #         self._find_serial_thread.start()
-    #         self._request_thread.start()
-    #         self._capture_thread.start()
+    def open(self):
+        if self._serial and self._serial.isOpen():
+            self._serial.close()
+
+        if self._stop_event.is_set():
+            logging.info("[*] interface.py: open() ->  reset threads")
+            self._stop_event.clear()
+            self._find_serial_thread = build_daemon(target=self._find_serial)
+            self._request_thread = build_daemon(target=self.start_requesting)
+            self._capture_thread = build_daemon(target=self.start_capturing)
+            self._find_serial_thread.start()
+            self._request_thread.start()
+            self._capture_thread.start()
 
     def close(self):
         self.notify_callbacks(build_event("exit"))
